@@ -1,0 +1,8 @@
+# Local Python environments and generated files
+.venv/
+.venv310/
+__pycache__/
+*.py[cod]
+
+# Streamlit local state
+.streamlit/secrets.toml

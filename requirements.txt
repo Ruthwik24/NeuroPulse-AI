@@ -1,0 +1,5 @@
+streamlit>=1.42,<2.0
+tensorflow>=2.16,<2.21
+nltk>=3.9,<4.0
+numpy>=1.26,<3.0
+scikit-learn>=1.7,<2.0
