@@ -352,16 +352,61 @@ st.markdown(
       }
       .stTextArea textarea:focus { border-color: rgba(34,227,255,.85) !important; box-shadow: 0 0 0 3px rgba(34,227,255,.15) !important; }
 
-      .stButton > button {
-        width: 100%; border: 0; border-radius: 16px; padding: .8rem;
-        font-weight: 750; font-size: 1rem; color: #04121b;
-        background: linear-gradient(90deg, #22e3ff, #5865f2, #7cffb2);
-        background-size: 200% auto;
-        transition: all .25s ease;
-        box-shadow: 0 8px 30px rgba(88,101,242,.4);
+      @keyframes btnGradientFlow {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
       }
-      .stButton > button:hover { background-position: right center; transform: translateY(-1px) scale(1.01); box-shadow: 0 10px 40px rgba(88,101,242,.65), 0 0 24px rgba(34,227,255,.4); }
-      .stButton > button:active { transform: translateY(0) scale(.99); }
+      @keyframes btnPulseRing {
+        0% { box-shadow: 0 0 0 0 rgba(34,227,255,.55), 0 8px 30px rgba(88,101,242,.4); }
+        70% { box-shadow: 0 0 0 12px rgba(34,227,255,0), 0 8px 30px rgba(88,101,242,.4); }
+        100% { box-shadow: 0 0 0 0 rgba(34,227,255,0), 0 8px 30px rgba(88,101,242,.4); }
+      }
+      @keyframes btnScan {
+        0% { transform: translateX(-120%) skewX(-20deg); }
+        100% { transform: translateX(220%) skewX(-20deg); }
+      }
+      .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {
+        position: relative; isolation: isolate; overflow: hidden;
+        width: 100%; border: 1px solid rgba(124,255,178,.55); border-radius: 14px;
+        padding: .85rem 1rem;
+        font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
+        font-weight: 700; font-size: .95rem; letter-spacing: .04em; text-transform: uppercase;
+        color: #04121b;
+        background: linear-gradient(100deg, #22e3ff, #5865f2, #7cffb2, #22e3ff);
+        background-size: 320% auto;
+        animation: btnGradientFlow 5s ease-in-out infinite, btnPulseRing 3.2s ease-in-out infinite;
+        transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, filter .25s ease;
+      }
+      .stButton > button::before, .stDownloadButton > button::before, .stFormSubmitButton > button::before {
+        content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
+        background: linear-gradient(90deg, #22e3ff, #5865f2, #7cffb2, #22e3ff);
+        background-size: 300% auto; filter: blur(10px); opacity: .0;
+        transition: opacity .25s ease;
+      }
+      .stButton > button::after, .stDownloadButton > button::after, .stFormSubmitButton > button::after {
+        content: ''; position: absolute; top: 0; left: 0; width: 35%; height: 100%;
+        background: linear-gradient(100deg, transparent, rgba(255,255,255,.75), transparent);
+        transform: translateX(-120%) skewX(-20deg); pointer-events: none;
+      }
+      .stButton > button:hover, .stDownloadButton > button:hover, .stFormSubmitButton > button:hover {
+        transform: translateY(-2px) scale(1.02);
+        filter: saturate(1.25) brightness(1.06);
+        box-shadow: 0 14px 46px rgba(88,101,242,.65), 0 0 30px rgba(34,227,255,.55), 0 0 0 1px rgba(124,255,178,.7);
+        animation-play-state: running;
+      }
+      .stButton > button:hover::before, .stDownloadButton > button:hover::before, .stFormSubmitButton > button:hover::before { opacity: .85; }
+      .stButton > button:hover::after, .stDownloadButton > button:hover::after, .stFormSubmitButton > button:hover::after {
+        animation: btnScan .9s ease forwards;
+      }
+      .stButton > button:active, .stDownloadButton > button:active, .stFormSubmitButton > button:active {
+        transform: translateY(0) scale(.97);
+        filter: brightness(.95);
+      }
+      .stButton > button:focus-visible, .stDownloadButton > button:focus-visible {
+        outline: none; box-shadow: 0 0 0 3px rgba(34,227,255,.5), 0 14px 46px rgba(88,101,242,.6);
+      }
+      .stButton > button p, .stDownloadButton > button p { font-family: inherit !important; letter-spacing: inherit !important; }
 
       [data-testid="stExpander"] { background: rgba(10,14,34,.55); border: 1px solid rgba(88,101,242,.25); border-radius: 18px; }
 
@@ -373,8 +418,12 @@ st.markdown(
       }
       .stTabs [aria-selected="true"] {
         background: linear-gradient(90deg, rgba(34,227,255,.18), rgba(88,101,242,.24)) !important;
-        color: #eef5ff !important; box-shadow: inset 0 0 0 1px rgba(34,227,255,.4);
+        color: #eef5ff !important; box-shadow: inset 0 0 0 1px rgba(34,227,255,.4), 0 0 18px rgba(34,227,255,.25);
+        animation: pulseGlow 3s ease-in-out infinite;
       }
+      .stTabs [data-baseweb="tab"]:hover { color:#eef5ff !important; background: rgba(34,227,255,.08) !important; }
+
+      [data-testid="stExpander"]:hover { border-color: rgba(34,227,255,.5); box-shadow: 0 0 22px rgba(34,227,255,.15); }
 
       /* Stat grid */
       .stat-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: .8rem; }
