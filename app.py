@@ -203,7 +203,7 @@ EXTERNAL_REPORT = [
 st.markdown(
     """
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
       html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
@@ -213,10 +213,10 @@ st.markdown(
       }
       .stApp {
         background:
-          radial-gradient(circle at 10% 0%, rgba(99,102,241,.28) 0, transparent 32%),
-          radial-gradient(circle at 90% 10%, rgba(236,72,153,.22) 0, transparent 30%),
-          radial-gradient(circle at 50% 100%, rgba(45,212,191,.18) 0, transparent 40%),
-          linear-gradient(160deg, #050914 0%, #0a0f24 45%, #0c0a1f 100%);
+          radial-gradient(circle at 10% 0%, rgba(0,224,255,.26) 0, transparent 32%),
+          radial-gradient(circle at 90% 10%, rgba(88,101,242,.24) 0, transparent 30%),
+          radial-gradient(circle at 50% 100%, rgba(56,232,180,.16) 0, transparent 40%),
+          linear-gradient(160deg, #030711 0%, #050b1e 45%, #030a14 100%);
         background-size: 140% 140%, 140% 140%, 140% 140%, 100% 100%;
         animation: auroraDrift 16s ease-in-out infinite;
         color: #eef5ff;
@@ -236,43 +236,44 @@ st.markdown(
         filter: drop-shadow(0 0 18px rgba(139,92,246,.65));
       }
       .eyebrow {
-        background: linear-gradient(90deg, #6ee7e1, #a78bfa, #f472b6, #6ee7e1);
+        background: linear-gradient(90deg, #22e3ff, #5865f2, #7cffb2, #22e3ff);
         background-size: 300% auto;
         -webkit-background-clip: text; background-clip: text; color: transparent;
         animation: shimmer 6s linear infinite;
         font-size: .8rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
       }
       h1 {
-        font-family: 'Space Grotesk', sans-serif !important;
-        font-size: clamp(2.3rem, 5.6vw, 4.3rem) !important;
-        line-height: 1.02 !important; margin: .5rem 0 .8rem !important; letter-spacing: -.04em;
-        background: linear-gradient(120deg, #eef5ff 30%, #a78bfa 60%, #6ee7e1 90%);
+        font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
+        font-size: clamp(2.1rem, 5.2vw, 3.9rem) !important;
+        line-height: 1.08 !important; margin: .5rem 0 .8rem !important; letter-spacing: -.01em;
+        background: linear-gradient(120deg, #eef5ff 25%, #5865f2 58%, #22e3ff 90%);
         -webkit-background-clip: text; background-clip: text; color: transparent;
+        text-shadow: 0 0 34px rgba(34,227,255,.25);
       }
       .lead { color: #aab8d4; font-size: 1.06rem; max-width: 760px; line-height: 1.7; }
-      .lead .hi { color: #6ee7e1; font-weight: 600; }
+      .lead .hi { color: #22e3ff; font-weight: 600; }
 
       .chip-row { display:flex; gap:.5rem; flex-wrap:wrap; margin: 1rem 0 1.6rem; }
       .chip {
         display:inline-flex; align-items:center; gap:.4rem;
-        background: rgba(139,92,246,.12); border: 1px solid rgba(167,139,250,.35);
-        color:#d8d3ff; font-size:.8rem; font-weight:600; padding:.35rem .8rem; border-radius:999px;
+        background: rgba(34,227,255,.1); border: 1px solid rgba(88,101,242,.4);
+        color:#c9e8ff; font-size:.8rem; font-weight:600; padding:.35rem .8rem; border-radius:999px;
       }
 
       .glass {
         position:relative; overflow:hidden;
-        background: linear-gradient(145deg, rgba(30,25,60,.55), rgba(10,14,32,.75));
-        border: 1px solid rgba(167,139,250,.25);
+        background: linear-gradient(145deg, rgba(15,25,55,.55), rgba(8,12,28,.75));
+        border: 1px solid rgba(88,101,242,.28);
         border-radius: 26px; padding: 1.5rem;
-        box-shadow: 0 20px 70px rgba(76,29,149,.18), inset 0 1px 0 rgba(255,255,255,.04);
+        box-shadow: 0 20px 70px rgba(13,60,110,.2), inset 0 1px 0 rgba(255,255,255,.04);
         backdrop-filter: blur(14px);
         margin-bottom: 1.2rem;
         transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
       }
       .glass:hover {
         transform: translateY(-3px);
-        border-color: rgba(167,139,250,.5);
-        box-shadow: 0 26px 80px rgba(76,29,149,.28), 0 0 0 1px rgba(110,231,225,.15), inset 0 1px 0 rgba(255,255,255,.06);
+        border-color: rgba(34,227,255,.5);
+        box-shadow: 0 26px 80px rgba(13,60,110,.32), 0 0 0 1px rgba(34,227,255,.18), inset 0 1px 0 rgba(255,255,255,.06);
       }
       .glass::before {
         content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
@@ -283,7 +284,7 @@ st.markdown(
       .glass:hover::before { left: 130%; }
       .glass-header { display:flex; align-items:center; gap:.5rem; margin-bottom:.9rem; }
       .glass-header .icon { font-size:1.2rem; }
-      .glass-title { font-family:'Space Grotesk', sans-serif; font-size:1.15rem; font-weight:700; color:#eef5ff; }
+      .glass-title { font-family:'Orbitron', 'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:700; color:#eef5ff; letter-spacing:.01em; }
       .glass-sub { color:#9dafc7; font-size:.86rem; margin-top:-.5rem; margin-bottom:1rem; }
 
       .signal-card { text-align:center; padding: 1.2rem 1rem 1.5rem; }
@@ -291,7 +292,7 @@ st.markdown(
         font-size: 3.4rem; animation: floaty 3s ease-in-out infinite;
         filter: drop-shadow(0 0 22px var(--glow-color, rgba(110,231,225,.7)));
       }
-      .signal { font-family:'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; letter-spacing: -.03em; margin: .3rem 0 .15rem; }
+      .signal { font-family:'Orbitron', 'Space Grotesk', sans-serif; font-size: 1.7rem; font-weight: 700; letter-spacing: 0; margin: .3rem 0 .15rem; }
       .signal-blurb { color:#9dafc7; font-size:.86rem; margin-bottom:.6rem; }
       .caption { color: #9dafc7; font-size: .85rem; }
 
@@ -329,12 +330,12 @@ st.markdown(
         opacity:1; animation: barSheen 1s linear infinite;
       }
       .dist-track:hover, .metric-track:hover {
-        box-shadow: 0 0 0 2px rgba(167,139,250,.45), 0 0 18px rgba(167,139,250,.3);
+        box-shadow: 0 0 0 2px rgba(34,227,255,.45), 0 0 18px rgba(34,227,255,.3);
       }
       .dist-track::after, .metric-track::after {
         content: attr(data-tooltip);
         position: absolute; bottom: 145%; left: 50%; transform: translateX(-50%) translateY(4px);
-        background: rgba(8,10,26,.96); border: 1px solid rgba(167,139,250,.5); color:#eef5ff;
+        background: rgba(6,10,24,.96); border: 1px solid rgba(34,227,255,.5); color:#eef5ff;
         font-size:.72rem; font-weight:700; padding:.4rem .65rem; border-radius:9px; white-space:nowrap;
         opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; z-index:30;
         box-shadow: 0 10px 26px rgba(0,0,0,.45);
@@ -345,50 +346,50 @@ st.markdown(
       }
 
       .stTextArea textarea {
-        background: rgba(8,10,26,.75) !important; color: #eff8ff !important;
-        border: 1px solid rgba(139,92,246,.4) !important; border-radius: 18px !important;
+        background: rgba(6,10,24,.75) !important; color: #eff8ff !important;
+        border: 1px solid rgba(88,101,242,.45) !important; border-radius: 18px !important;
         font-size: 1.02rem !important; padding: 1rem !important;
       }
-      .stTextArea textarea:focus { border-color: rgba(110,231,225,.8) !important; box-shadow: 0 0 0 3px rgba(110,231,225,.15) !important; }
+      .stTextArea textarea:focus { border-color: rgba(34,227,255,.85) !important; box-shadow: 0 0 0 3px rgba(34,227,255,.15) !important; }
 
       .stButton > button {
         width: 100%; border: 0; border-radius: 16px; padding: .8rem;
-        font-weight: 750; font-size: 1rem; color: #05111b;
-        background: linear-gradient(90deg, #6ee7e1, #a78bfa, #f472b6);
+        font-weight: 750; font-size: 1rem; color: #04121b;
+        background: linear-gradient(90deg, #22e3ff, #5865f2, #7cffb2);
         background-size: 200% auto;
         transition: all .25s ease;
-        box-shadow: 0 8px 30px rgba(139,92,246,.35);
+        box-shadow: 0 8px 30px rgba(88,101,242,.4);
       }
-      .stButton > button:hover { background-position: right center; transform: translateY(-1px) scale(1.01); box-shadow: 0 10px 40px rgba(139,92,246,.6), 0 0 24px rgba(110,231,225,.35); }
+      .stButton > button:hover { background-position: right center; transform: translateY(-1px) scale(1.01); box-shadow: 0 10px 40px rgba(88,101,242,.65), 0 0 24px rgba(34,227,255,.4); }
       .stButton > button:active { transform: translateY(0) scale(.99); }
 
-      [data-testid="stExpander"] { background: rgba(15,18,40,.55); border: 1px solid rgba(139,92,246,.22); border-radius: 18px; }
+      [data-testid="stExpander"] { background: rgba(10,14,34,.55); border: 1px solid rgba(88,101,242,.25); border-radius: 18px; }
 
       /* Tabs */
-      .stTabs [data-baseweb="tab-list"] { gap: 6px; background: rgba(255,255,255,.03); padding: 6px; border-radius: 16px; border: 1px solid rgba(139,92,246,.18); }
+      .stTabs [data-baseweb="tab-list"] { gap: 6px; background: rgba(255,255,255,.03); padding: 6px; border-radius: 16px; border: 1px solid rgba(88,101,242,.2); }
       .stTabs [data-baseweb="tab"] {
         height: 44px; border-radius: 12px; color:#aab8d4; font-weight:600; font-size:.9rem;
         background: transparent; padding: 0 1rem;
       }
       .stTabs [aria-selected="true"] {
-        background: linear-gradient(90deg, rgba(110,231,225,.18), rgba(167,139,250,.22)) !important;
-        color: #eef5ff !important; box-shadow: inset 0 0 0 1px rgba(167,139,250,.4);
+        background: linear-gradient(90deg, rgba(34,227,255,.18), rgba(88,101,242,.24)) !important;
+        color: #eef5ff !important; box-shadow: inset 0 0 0 1px rgba(34,227,255,.4);
       }
 
       /* Stat grid */
       .stat-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: .8rem; }
       .stat-card {
-        background: rgba(255,255,255,.03); border: 1px solid rgba(139,92,246,.2); border-radius:18px;
+        background: rgba(255,255,255,.03); border: 1px solid rgba(88,101,242,.22); border-radius:18px;
         padding: 1rem; text-align:center;
       }
       .stat-num { font-family:'JetBrains Mono', monospace; font-size:1.6rem; font-weight:700;
-        background: linear-gradient(90deg, #6ee7e1, #a78bfa); -webkit-background-clip:text; background-clip:text; color:transparent; }
+        background: linear-gradient(90deg, #22e3ff, #5865f2); -webkit-background-clip:text; background-clip:text; color:transparent; }
       .stat-lbl { color:#9dafc7; font-size:.76rem; margin-top:.25rem; text-transform:uppercase; letter-spacing:.06em; }
 
       /* Model grid */
       .model-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: .8rem; }
       .model-card {
-        background: rgba(255,255,255,.03); border: 1px solid rgba(139,92,246,.2); border-radius:18px;
+        background: rgba(255,255,255,.03); border: 1px solid rgba(88,101,242,.22); border-radius:18px;
         padding: 1rem 1.1rem;
       }
       .model-card .m-icon { font-size:1.5rem; }
@@ -405,30 +406,115 @@ st.markdown(
       .lb-row.best td { background: linear-gradient(90deg, rgba(110,231,225,.13), rgba(167,139,250,.13)); }
       .rank-badge {
         display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px;
-        font-weight:700; font-size:.78rem; background: rgba(139,92,246,.18); color:#d8d3ff;
+        font-weight:700; font-size:.78rem; background: rgba(88,101,242,.2); color:#c9e8ff;
       }
       .rank-badge.gold { background: linear-gradient(135deg,#facc15,#f59e0b); color:#3a2a00; }
       .metric-track { display:inline-block; width:90px; height:8px; background:rgba(255,255,255,.08); border-radius:99px; vertical-align:middle; margin-left:.6rem; overflow:visible; }
-      .metric-fill { display:block; height:100%; border-radius:99px; background: linear-gradient(90deg,#6ee7e1,#a78bfa); position:relative; overflow:hidden; }
+      .metric-fill { display:block; height:100%; border-radius:99px; background: linear-gradient(90deg,#22e3ff,#5865f2); position:relative; overflow:hidden; }
 
       /* Pipeline */
       .pipeline { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
       .pipe-step {
-        background: rgba(139,92,246,.1); border:1px solid rgba(167,139,250,.3); border-radius:14px;
-        padding:.55rem .9rem; font-size:.82rem; color:#d8d3ff; font-weight:600; white-space:nowrap;
+        background: rgba(88,101,242,.1); border:1px solid rgba(88,101,242,.32); border-radius:14px;
+        padding:.55rem .9rem; font-size:.82rem; color:#c9e8ff; font-weight:600; white-space:nowrap;
       }
-      .pipe-arrow { color:#6ee7e1; font-size:1.1rem; }
+      .pipe-arrow { color:#22e3ff; font-size:1.1rem; }
 
       .footer-note {
         margin-top: 2.4rem; padding: 1rem 1.2rem; border-radius: 16px;
-        background: rgba(236,72,153,.07); border: 1px solid rgba(236,72,153,.22);
-        color:#c9b8d8; font-size:.82rem; display:flex; gap:.6rem; align-items:flex-start;
+        background: rgba(34,227,255,.06); border: 1px solid rgba(34,227,255,.2);
+        color:#bcd6e8; font-size:.82rem; display:flex; gap:.6rem; align-items:flex-start;
       }
       .footer-note .icon { animation: pulseGlow 2.4s ease-in-out infinite; }
     </style>
     """,
     unsafe_allow_html=True,
 )
+
+NEURON_POSITIONS = [
+    (6, 18), (16, 62), (24, 12), (33, 78), (41, 34), (50, 8), (52, 90),
+    (61, 48), (69, 20), (74, 70), (83, 38), (91, 14), (95, 82), (12, 40),
+    (44, 60), (78, 92), (58, 26), (30, 46), (89, 58), (8, 84),
+]
+NEURON_SYNAPSES = [
+    (0, 2), (0, 13), (1, 13), (1, 14), (2, 4), (2, 5), (3, 14), (3, 17),
+    (4, 5), (4, 16), (4, 17), (5, 8), (6, 14), (6, 15), (7, 16), (7, 18),
+    (8, 16), (9, 16), (9, 11), (10, 18), (10, 12), (11, 12), (12, 8),
+    (13, 17), (14, 6), (15, 18), (16, 5), (17, 8), (18, 9), (19, 13),
+]
+
+
+def _build_neural_bg() -> str:
+    """Fixed-position SVG of glowing neuron nodes wired by pulsing synapses."""
+    circles = "".join(
+        f'<circle class="neuron" cx="{x}" cy="{y}" r="{0.55 + (i % 3) * 0.12}" '
+        f'style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        for i, (x, y) in enumerate(NEURON_POSITIONS)
+    )
+    lines = "".join(
+        f'<line class="synapse" x1="{NEURON_POSITIONS[a][0]}" y1="{NEURON_POSITIONS[a][1]}" '
+        f'x2="{NEURON_POSITIONS[b][0]}" y2="{NEURON_POSITIONS[b][1]}" '
+        f'style="animation-delay:{((a + b) * 0.29) % 5:.2f}s"/>'
+        for i, (a, b) in enumerate(NEURON_SYNAPSES)
+    )
+    return f'''
+    <div class="neural-bg">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <g class="synapses">{lines}</g>
+            <g class="neurons">{circles}</g>
+        </svg>
+    </div>
+    '''
+
+
+st.markdown(
+    """
+    <style>
+      .neural-bg {
+        position: fixed; inset: 0; width: 100vw; height: 100vh;
+        z-index: 0; pointer-events: none; overflow: hidden;
+      }
+      .neural-bg svg { width: 100%; height: 100%; }
+      .synapse {
+        stroke: url(#synapseGrad);
+        stroke-width: .1;
+        opacity: .16;
+        stroke-dasharray: 3 5;
+        animation: synapseFire 4.5s linear infinite;
+      }
+      .neuron {
+        fill: #22e3ff;
+        opacity: .55;
+        filter: drop-shadow(0 0 .9px rgba(34,227,255,.9));
+        animation: neuronFire 3.6s ease-in-out infinite;
+      }
+      @keyframes synapseFire {
+        0%   { stroke-dashoffset: 40; opacity: .10; }
+        45%  { opacity: .5; }
+        50%  { stroke-dashoffset: 0; opacity: .55; }
+        55%  { opacity: .5; }
+        100% { stroke-dashoffset: -40; opacity: .10; }
+      }
+      @keyframes neuronFire {
+        0%, 100% { opacity: .35; r: .55; }
+        50% { opacity: 1; r: .95; filter: drop-shadow(0 0 2.4px rgba(124,255,178,.95)); }
+      }
+      /* Keep real app content above the neuron layer */
+      .block-container, [data-testid="stHeader"] { position: relative; z-index: 1; }
+    </style>
+    <svg width="0" height="0">
+      <defs>
+        <linearGradient id="synapseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#22e3ff"/>
+          <stop offset="50%" stop-color="#5865f2"/>
+          <stop offset="100%" stop-color="#7cffb2"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    """,
+    unsafe_allow_html=True,
+)
+st.markdown(_build_neural_bg(), unsafe_allow_html=True)
 
 st.markdown(
     '<div class="brand-row"><span class="brand-badge">🧠</span>'
