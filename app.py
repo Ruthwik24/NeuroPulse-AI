@@ -207,12 +207,18 @@ st.markdown(
 
       html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
+      @keyframes auroraDrift {
+        0%,100% { background-position: 10% 0%, 90% 10%, 50% 100%, 0 0; }
+        50% { background-position: 16% 6%, 84% 4%, 44% 94%, 0 0; }
+      }
       .stApp {
         background:
           radial-gradient(circle at 10% 0%, rgba(99,102,241,.28) 0, transparent 32%),
           radial-gradient(circle at 90% 10%, rgba(236,72,153,.22) 0, transparent 30%),
           radial-gradient(circle at 50% 100%, rgba(45,212,191,.18) 0, transparent 40%),
           linear-gradient(160deg, #050914 0%, #0a0f24 45%, #0c0a1f 100%);
+        background-size: 140% 140%, 140% 140%, 140% 140%, 100% 100%;
+        animation: auroraDrift 16s ease-in-out infinite;
         color: #eef5ff;
         background-attachment: fixed;
       }
@@ -261,7 +267,20 @@ st.markdown(
         box-shadow: 0 20px 70px rgba(76,29,149,.18), inset 0 1px 0 rgba(255,255,255,.04);
         backdrop-filter: blur(14px);
         margin-bottom: 1.2rem;
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
       }
+      .glass:hover {
+        transform: translateY(-3px);
+        border-color: rgba(167,139,250,.5);
+        box-shadow: 0 26px 80px rgba(76,29,149,.28), 0 0 0 1px rgba(110,231,225,.15), inset 0 1px 0 rgba(255,255,255,.06);
+      }
+      .glass::before {
+        content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
+        background: linear-gradient(100deg, transparent, rgba(255,255,255,.05), transparent);
+        transform: skewX(-20deg); pointer-events:none;
+        transition: left .7s ease;
+      }
+      .glass:hover::before { left: 130%; }
       .glass-header { display:flex; align-items:center; gap:.5rem; margin-bottom:.9rem; }
       .glass-header .icon { font-size:1.2rem; }
       .glass-title { font-family:'Space Grotesk', sans-serif; font-size:1.15rem; font-weight:700; color:#eef5ff; }
@@ -279,9 +298,51 @@ st.markdown(
       .dist-row { display:flex; align-items:center; gap:.6rem; margin: .55rem 0; }
       .dist-emoji { font-size:1.05rem; width:1.4rem; text-align:center; }
       .dist-label { flex: 0 0 128px; font-size:.85rem; color:#cfd9ee; font-weight:600; }
-      .dist-pct { flex: 0 0 48px; text-align:right; font-size:.82rem; color:#9dafc7; font-variant-numeric: tabular-nums; }
-      .dist-track { flex:1; height:9px; background: rgba(255,255,255,.06); border-radius:999px; overflow:hidden; }
-      .dist-fill { height:100%; border-radius:999px; box-shadow: 0 0 12px 0 var(--glow, rgba(110,231,225,.6)); }
+      .dist-pct { flex: 0 0 58px; text-align:right; font-size:.82rem; color:#9dafc7; font-variant-numeric: tabular-nums; transition: color .2s ease, transform .2s ease; }
+      .dist-row:hover .dist-pct { color:#eef5ff; transform: scale(1.08); }
+
+      /* --- Interactive bars: hover glow + tooltip + grow-in animation --- */
+      @keyframes growBar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+      @keyframes barSheen { 0% { background-position: -120% 0; } 100% { background-position: 220% 0; } }
+
+      .dist-track, .metric-track {
+        position: relative; cursor: pointer;
+        transition: box-shadow .25s ease, background .25s ease;
+      }
+      .dist-track { flex:1; height:11px; background: rgba(255,255,255,.06); border-radius:999px; overflow:visible; }
+      .dist-fill {
+        display:block; height:100%; border-radius:999px; transform-origin:left;
+        box-shadow: 0 0 12px 0 var(--glow, rgba(110,231,225,.6));
+        animation: growBar .9s cubic-bezier(.16,1,.3,1) both;
+        transition: filter .2s ease, box-shadow .2s ease;
+        overflow: hidden; position: relative;
+      }
+      .dist-fill::after, .metric-fill::after {
+        content:''; position:absolute; inset:0;
+        background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,.55) 50%, transparent 80%);
+        background-size: 200% 100%; opacity:0; transition: opacity .2s ease;
+      }
+      .dist-row:hover .dist-fill, .lb-row:hover .metric-fill {
+        filter: brightness(1.35) saturate(1.35);
+      }
+      .dist-row:hover .dist-fill::after, .lb-row:hover .metric-fill::after {
+        opacity:1; animation: barSheen 1s linear infinite;
+      }
+      .dist-track:hover, .metric-track:hover {
+        box-shadow: 0 0 0 2px rgba(167,139,250,.45), 0 0 18px rgba(167,139,250,.3);
+      }
+      .dist-track::after, .metric-track::after {
+        content: attr(data-tooltip);
+        position: absolute; bottom: 145%; left: 50%; transform: translateX(-50%) translateY(4px);
+        background: rgba(8,10,26,.96); border: 1px solid rgba(167,139,250,.5); color:#eef5ff;
+        font-size:.72rem; font-weight:700; padding:.4rem .65rem; border-radius:9px; white-space:nowrap;
+        opacity:0; pointer-events:none; transition: opacity .2s ease, transform .2s ease; z-index:30;
+        box-shadow: 0 10px 26px rgba(0,0,0,.45);
+        font-family:'JetBrains Mono', monospace;
+      }
+      .dist-track:hover::after, .metric-track:hover::after {
+        opacity:1; transform: translateX(-50%) translateY(-4px);
+      }
 
       .stTextArea textarea {
         background: rgba(8,10,26,.75) !important; color: #eff8ff !important;
@@ -298,7 +359,8 @@ st.markdown(
         transition: all .25s ease;
         box-shadow: 0 8px 30px rgba(139,92,246,.35);
       }
-      .stButton > button:hover { background-position: right center; transform: translateY(-1px); box-shadow: 0 10px 36px rgba(139,92,246,.5); }
+      .stButton > button:hover { background-position: right center; transform: translateY(-1px) scale(1.01); box-shadow: 0 10px 40px rgba(139,92,246,.6), 0 0 24px rgba(110,231,225,.35); }
+      .stButton > button:active { transform: translateY(0) scale(.99); }
 
       [data-testid="stExpander"] { background: rgba(15,18,40,.55); border: 1px solid rgba(139,92,246,.22); border-radius: 18px; }
 
@@ -346,8 +408,8 @@ st.markdown(
         font-weight:700; font-size:.78rem; background: rgba(139,92,246,.18); color:#d8d3ff;
       }
       .rank-badge.gold { background: linear-gradient(135deg,#facc15,#f59e0b); color:#3a2a00; }
-      .metric-track { display:inline-block; width:70px; height:6px; background:rgba(255,255,255,.08); border-radius:99px; vertical-align:middle; margin-left:.5rem; overflow:hidden; }
-      .metric-fill { height:100%; border-radius:99px; background: linear-gradient(90deg,#6ee7e1,#a78bfa); }
+      .metric-track { display:inline-block; width:90px; height:8px; background:rgba(255,255,255,.08); border-radius:99px; vertical-align:middle; margin-left:.6rem; overflow:visible; }
+      .metric-fill { display:block; height:100%; border-radius:99px; background: linear-gradient(90deg,#6ee7e1,#a78bfa); position:relative; overflow:hidden; }
 
       /* Pipeline */
       .pipeline { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
@@ -450,7 +512,7 @@ with tab_analyze:
                     <div class="dist-row">
                         <span class="dist-emoji">{c_info["emoji"]}</span>
                         <span class="dist-label">{c_info["name"]}</span>
-                        <span class="dist-track">
+                        <span class="dist-track" data-tooltip="{c_info["name"]}: {pct:.1f}% of prediction confidence">
                             <span class="dist-fill" style="width:{pct:.1f}%; background:{c_info["color"]}; --glow: rgba({c_info["glow"]},.6);"></span>
                         </span>
                         <span class="dist-pct">{pct:.1f}%</span>
@@ -488,14 +550,16 @@ with tab_eda:
         max_count = max(c["count"] for c in CLASS_COUNTS)
         rows_html = '<div class="glass"><div class="glass-header"><span class="icon">⚖️</span>' \
                     '<span class="glass-title">Class balance (imbalanced, real-world)</span></div>'
+        total_rows = sum(c["count"] for c in CLASS_COUNTS)
         for c in CLASS_COUNTS:
             info = sentiment_info(c["label"])
             pct_of_max = c["count"] / max_count * 100
+            pct_of_total = c["count"] / total_rows * 100
             rows_html += f'''
             <div class="dist-row">
                 <span class="dist-emoji">{info["emoji"]}</span>
                 <span class="dist-label">{info["name"]}</span>
-                <span class="dist-track">
+                <span class="dist-track" data-tooltip="{c['count']:,} of {total_rows:,} posts · {pct_of_total:.1f}% of dataset">
                     <span class="dist-fill" style="width:{pct_of_max:.1f}%; background:{info["color"]}; --glow: rgba({info["glow"]},.6);"></span>
                 </span>
                 <span class="dist-pct">{c["count"]:,}</span>
@@ -636,7 +700,7 @@ with tab_leaderboard:
             <td><span class="{badge_cls}">{badge}</span></td>
             <td><b>{r['model']}</b>{' <span class="chip" style="padding:.1rem .5rem;font-size:.68rem;">CHAMPION</span>' if is_best else ''}</td>
             <td>{r['accuracy']:.1%}</td>
-            <td>{r['f1_macro']:.3f}<span class="metric-track"><span class="metric-fill" style="width:{bar_pct:.0f}%;"></span></span></td>
+            <td>{r['f1_macro']:.3f}<span class="metric-track" data-tooltip="{r['f1_macro']:.3f} · {bar_pct:.0f}% of top score ({max_f1:.3f})"><span class="metric-fill" style="width:{bar_pct:.0f}%;"></span></span></td>
             <td>{r['f1_weighted']:.3f}</td>
             <td>{r['roc_auc']:.3f}</td>
             <td>{r['epochs']}</td>
