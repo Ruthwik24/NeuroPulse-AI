@@ -1043,13 +1043,13 @@ def predict(text: str):
 
 
 SENTIMENT_MAP = {
-    -2: {"name": "Very Negative", "emoji": "🌩️", "color": "#ff5c7a", "glow": "255,92,122",
+    -2: {"name": "Very Negative", "emoji": "🌩️", "color": "#ff3b3b", "glow": "255,59,59",
          "blurb": "Signals of significant distress"},
-    -1: {"name": "Negative", "emoji": "🌧️", "color": "#ff9a5c", "glow": "255,154,92",
+    -1: {"name": "Negative", "emoji": "🌧️", "color": "#ff9a3c", "glow": "255,154,60",
          "blurb": "Signals of mild distress or worry"},
-    0: {"name": "Neutral", "emoji": "🌤️", "color": "#8fa9ff", "glow": "143,169,255",
+    0: {"name": "Neutral", "emoji": "🌤️", "color": "#f5d742", "glow": "245,215,66",
         "blurb": "Balanced, everyday tone"},
-    1: {"name": "Positive", "emoji": "🌈", "color": "#65e6b8", "glow": "101,230,184",
+    1: {"name": "Positive", "emoji": "🌈", "color": "#39e26f", "glow": "57,226,111",
         "blurb": "Signals of hope or wellbeing"},
 }
 
