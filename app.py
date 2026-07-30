@@ -119,38 +119,16 @@ SENTIMENT_MAP = {
 DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#a7b8cf", "glow": "167,184,207",
                       "blurb": "Outside the known intensity scale", "mood": "❔"}
 
-# Sample statements the person can tap to try the analyzer instantly — one
-# gentle, illustrative example per intensity class.
-EXAMPLE_STATEMENTS = {
-    1: [
-        "I finally slept through the night and woke up actually feeling like myself again.",
-        "Talking to my therapist today helped me see how far I've really come.",
-        "Started running again this week and honestly, I forgot how good it feels to be proud of myself.",
-    ],
-    0: [
-        "Went to work, made dinner, watched a show. Pretty ordinary day overall.",
-        "Still figuring out my routine, nothing exciting to report either way.",
-        "Appointment got rescheduled to next Tuesday, so I guess I'll just wait.",
-    ],
-    -1: [
-        "I've been feeling kind of low and unmotivated the past few days.",
-        "Work has been overwhelming and I can't seem to shake this worry.",
-        "I keep replaying that conversation in my head and I don't know why it's bothering me so much.",
-    ],
-    -2: [
-        "I feel completely numb and don't see the point in anything anymore.",
-        "Everything feels hopeless right now and I don't know how to keep going.",
-        "I can't remember the last time I felt anything other than exhausted and empty.",
-    ],
-}
+DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#a7b8cf", "glow": "167,184,207",
+                      "blurb": "Outside the known intensity scale", "mood": "❔"}
 
 # ---------------------------------------------------------------------------
 # Live theme state — the whole interface's accent colour tracks the most
 # recently predicted sentiment, like a nervous system reacting to signal.
-# Reverts to a calm resting-state teal whenever the input is cleared.
+# Reverts to a resting-state "quantum coral" whenever the input is cleared.
 # ---------------------------------------------------------------------------
-RESTING_COLOR = "#8b5cf6"
-RESTING_GLOW = "139,92,246"
+RESTING_COLOR = "#ff5eae"
+RESTING_GLOW = "255,94,174"
 
 if "theme_color" not in st.session_state:
     st.session_state.theme_color = RESTING_COLOR
@@ -158,6 +136,15 @@ if "theme_color" not in st.session_state:
     st.session_state.last_result = None  # (text, label, probabilities, classes, tokens)
 if "analyzer_text_area" not in st.session_state:
     st.session_state.analyzer_text_area = ""
+if "clear_requested" not in st.session_state:
+    st.session_state.clear_requested = False
+
+# A widget's session_state key can't be reassigned after that widget has
+# already been instantiated in the same script run — so any pending "clear"
+# from the previous run must be applied here, before the text_area is built.
+if st.session_state.clear_requested:
+    st.session_state.analyzer_text_area = ""
+    st.session_state.clear_requested = False
 
 
 def sentiment_info(label) -> dict:
@@ -554,123 +541,40 @@ st.markdown(
 )
 
 # ---------------------------------------------------------------------------
-# Anatomical nervous-system background: a brain, a curving spinal cord, and
-# bilateral peripheral-nerve branches (cervical/brachial, intercostal,
-# lumbosacral) fanning outward — pulses of "signal" travel down each path.
+# Dotted neural-network background: glowing neuron nodes wired by pulsing,
+# colourful synapse lines.
 # ---------------------------------------------------------------------------
-BRAIN_PATH = (
-    "M50,4 C40,3 32,8 30,15 C24,16 20,22 22,28 C19,32 20,38 25,40 "
-    "C26,45 32,48 38,47 C42,50 48,51 52,49 C58,51 65,49 68,44 "
-    "C74,44 78,39 77,33 C81,29 80,22 75,19 C75,12 68,6 60,6 C57,4 53,3 50,4 Z"
-)
-BRAIN_FOLDS = [
-    "M32,14 C36,18 36,24 31,27",
-    "M42,9 C44,16 40,22 44,28",
-    "M54,8 C56,15 60,20 57,28",
-    "M64,13 C68,17 67,24 71,29",
-    "M38,33 C43,36 48,35 52,38",
+NEURON_POSITIONS = [
+    (6, 18), (16, 62), (24, 12), (33, 78), (41, 34), (50, 8), (52, 90),
+    (61, 48), (69, 20), (74, 70), (83, 38), (91, 14), (95, 82), (12, 40),
+    (44, 60), (78, 92), (58, 26), (30, 46), (89, 58), (8, 84),
 ]
-
-# Each branch trunk starts at a point on the spine and fans outward+downward;
-# every trunk ends in 2 fine "dendrite" twigs. Right-side coordinates only —
-# mirrored across x=50 at render time to give the left side automatically.
-SPINE_D = "M50,30 C47,50 53,72 49,94 C46,114 52,134 50,158"
-
-NERVE_TRUNKS_RIGHT = [
-    {"pts": [(50, 34), (61, 30), (73, 24), (84, 18)], "twigs": [[(84, 18), (91, 12)], [(84, 18), (90, 24)]]},
-    {"pts": [(50, 46), (63, 49), (76, 51), (89, 52)], "twigs": [[(89, 52), (96, 46)], [(89, 52), (95, 59)]]},
-    {"pts": [(49, 58), (64, 60), (79, 60)], "twigs": [[(79, 60), (86, 56)], [(79, 60), (86, 64)]]},
-    {"pts": [(48, 70), (63, 73), (77, 74)], "twigs": [[(77, 74), (84, 70)], [(77, 74), (84, 79)]]},
-    {"pts": [(48, 84), (61, 88), (72, 90)], "twigs": [[(72, 90), (79, 86)], [(72, 90), (79, 94)]]},
-    {"pts": [(49, 98), (60, 105), (69, 110)], "twigs": [[(69, 110), (76, 106)], [(69, 110), (76, 114)]]},
-    {"pts": [(50, 118), (57, 130), (63, 144), (67, 160)], "twigs": [[(67, 160), (71, 156)], [(67, 160), (64, 166)]]},
+NEURON_SYNAPSES = [
+    (0, 2), (0, 13), (1, 13), (1, 14), (2, 4), (2, 5), (3, 14), (3, 17),
+    (4, 5), (4, 16), (4, 17), (5, 8), (6, 14), (6, 15), (7, 16), (7, 18),
+    (8, 16), (9, 16), (9, 11), (10, 18), (10, 12), (11, 12), (12, 8),
+    (13, 17), (14, 6), (15, 18), (16, 5), (17, 8), (18, 9), (19, 13),
 ]
-
-
-NETWORK_NODES = [
-    (35, 12), (45, 10), (55, 11), (65, 14), (30, 20), (42, 22), (58, 21),
-    (70, 20), (36, 30), (50, 32), (64, 30), (40, 40), (60, 40), (50, 44),
-]
-NETWORK_EDGES = (
-    [(i, (i + 1) % len(NETWORK_NODES)) for i in range(len(NETWORK_NODES))]
-    + [(i, (i + 4) % len(NETWORK_NODES)) for i in range(len(NETWORK_NODES))]
-)
-
-# Four fixed markers — one per emotion class — pulsing in their own true
-# sentiment colour (independent of the live accent) so the background always
-# reads as "the four human emotions" this model was trained to recognise.
-EMOTION_MARKERS = [
-    (14, 52, 1), (86, 52, 0), (14, 122, -1), (86, 122, -2),
-]
-
-
-def _mirror(points):
-    return [(100 - x, y) for x, y in points]
-
-
-def _polyline_d(points):
-    x0, y0 = points[0]
-    d = f"M{x0:.1f},{y0:.1f} "
-    d += " ".join(f"L{x:.1f},{y:.1f}" for x, y in points[1:])
-    return d
 
 
 def _build_neural_bg() -> str:
-    """Fixed-position SVG blending a brain, an internal neural-network mesh,
-    a spinal cord with branching peripheral nerves, and four pulsing
-    emotion markers — brain + neural net + nervous system + human emotion,
-    all in one living diagram."""
-    fold_paths = "".join(f'<path class="fold" d="{d}"/>' for d in BRAIN_FOLDS)
-
-    nerve_paths = []
-    ganglia = []
-    twig_paths = []
-    for i, trunk in enumerate(NERVE_TRUNKS_RIGHT):
-        for side_points in (trunk["pts"], _mirror(trunk["pts"])):
-            delay = (i * 0.55) % 4.2
-            nerve_paths.append(
-                f'<path class="nerve" d="{_polyline_d(side_points)}" style="animation-delay:{delay:.2f}s"/>'
-            )
-            gx, gy = side_points[-1]
-            ganglia.append(f'<circle class="ganglion" cx="{gx:.1f}" cy="{gy:.1f}" r="0.85" '
-                            f'style="animation-delay:{delay:.2f}s"/>')
-        for side_twigs in (trunk["twigs"], [_mirror(t) for t in trunk["twigs"]]):
-            for twig in side_twigs:
-                twig_paths.append(
-                    f'<path class="twig" d="{_polyline_d(twig)}" style="animation-delay:{(delay + 0.3):.2f}s"/>'
-                )
-
-    net_edges = "".join(
-        f'<line class="net-edge" x1="{NETWORK_NODES[a][0]}" y1="{NETWORK_NODES[a][1]}" '
-        f'x2="{NETWORK_NODES[b][0]}" y2="{NETWORK_NODES[b][1]}" '
-        f'style="animation-delay:{((a + b) * 0.21) % 4:.2f}s"/>'
-        for a, b in NETWORK_EDGES
+    """Fixed-position SVG of glowing neuron nodes wired by pulsing synapses."""
+    circles = "".join(
+        f'<circle class="neuron" cx="{x}" cy="{y}" r="{0.55 + (i % 3) * 0.12}" '
+        f'style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        for i, (x, y) in enumerate(NEURON_POSITIONS)
     )
-    net_nodes = "".join(
-        f'<circle class="net-node" cx="{x}" cy="{y}" r="0.6" style="animation-delay:{(i * 0.33) % 3.6:.2f}s"/>'
-        for i, (x, y) in enumerate(NETWORK_NODES)
+    lines = "".join(
+        f'<line class="synapse" x1="{NEURON_POSITIONS[a][0]}" y1="{NEURON_POSITIONS[a][1]}" '
+        f'x2="{NEURON_POSITIONS[b][0]}" y2="{NEURON_POSITIONS[b][1]}" '
+        f'style="animation-delay:{((a + b) * 0.29) % 5:.2f}s"/>'
+        for i, (a, b) in enumerate(NEURON_SYNAPSES)
     )
-
-    emo_markers = "".join(
-        f'<g class="emo-marker" style="--ex:{x}; --ey:{y}; animation-delay:{abs(label) * 0.4:.2f}s">'
-        f'<circle class="emo-halo" cx="{x}" cy="{y}" r="3.4" fill="{sentiment_info(label)["color"]}"/>'
-        f'<text class="emo-glyph" x="{x}" y="{y + 1.3}" text-anchor="middle">{sentiment_info(label)["mood"]}</text>'
-        f'</g>'
-        for x, y, label in EMOTION_MARKERS
-    )
-
     return f'''
     <div class="neural-bg">
-        <svg viewBox="0 0 100 170" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-            <g class="emo-markers">{emo_markers}</g>
-            <g class="nerves">{''.join(nerve_paths)}</g>
-            <g class="twigs">{''.join(twig_paths)}</g>
-            <path class="spine" d="{SPINE_D}"/>
-            <path class="brain-outline" d="{BRAIN_PATH}"/>
-            <g class="brain-folds">{fold_paths}</g>
-            <g class="net-edges">{net_edges}</g>
-            <g class="net-nodes">{net_nodes}</g>
-            <g class="ganglia">{''.join(ganglia)}</g>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <g class="synapses">{lines}</g>
+            <g class="neurons">{circles}</g>
         </svg>
     </div>
     '''
@@ -682,100 +586,43 @@ st.markdown(
       .neural-bg {
         position: fixed; inset: 0; width: 100vw; height: 100vh;
         z-index: 0; pointer-events: none; overflow: hidden;
-        opacity: .5;
       }
       .neural-bg svg { width: 100%; height: 100%; }
-
-      .brain-outline {
-        fill: url(#brainFill); fill-opacity: .16;
-        stroke: url(#nerveGrad); stroke-width: .35; stroke-linejoin: round;
-        filter: drop-shadow(0 0 2.5px rgba(var(--accent-glow),.55));
-        animation: brainPulse 4.8s ease-in-out infinite;
+      .synapse {
+        stroke: url(#synapseGrad);
+        stroke-width: .1;
+        opacity: .18;
+        stroke-dasharray: 3 5;
+        animation: synapseFire 4.5s linear infinite;
       }
-      .brain-folds .fold {
-        fill: none; stroke: rgba(var(--accent-glow),.55); stroke-width: .28;
-        stroke-linecap: round; opacity: .5;
-        animation: foldGlow 3.6s ease-in-out infinite;
+      .neuron {
+        fill: var(--accent);
+        opacity: .55;
+        filter: drop-shadow(0 0 .9px rgba(var(--accent-glow),.9));
+        animation: neuronFire 3.6s ease-in-out infinite;
       }
-      .spine {
-        fill: none; stroke: url(#nerveGrad); stroke-width: .55; stroke-linecap: round;
-        opacity: .5; filter: drop-shadow(0 0 2px rgba(var(--accent-glow),.5));
-      }
-      .nerve {
-        fill: none; stroke: url(#nerveGrad); stroke-width: .32; stroke-linecap: round; stroke-linejoin: round;
-        stroke-dasharray: 2.4 4.5; opacity: .38;
-        animation: pulseTravel 3.4s linear infinite;
-      }
-      .twig {
-        fill: none; stroke: rgba(var(--accent-glow),.5); stroke-width: .22; stroke-linecap: round;
-        opacity: .3; stroke-dasharray: 1.2 2.4;
-        animation: pulseTravel 3.4s linear infinite;
-      }
-      .ganglion {
-        fill: var(--accent); opacity: .5;
-        filter: drop-shadow(0 0 1.6px rgba(var(--accent-glow),.9));
-        animation: neuronFire 3.4s ease-in-out infinite;
-      }
-      .net-edge {
-        stroke: url(#nerveGrad); stroke-width: .14; opacity: .3;
-        stroke-dasharray: 1.4 1.6;
-        animation: netFire 3s linear infinite;
-      }
-      .net-node {
-        fill: #ffe08a; opacity: .45;
-        filter: drop-shadow(0 0 1.2px rgba(var(--accent-glow),.8));
-        animation: neuronFire 2.8s ease-in-out infinite;
-      }
-      .emo-marker { transform-box: fill-box; transform-origin: center; animation: emoDrift 6s ease-in-out infinite; }
-      .emo-halo { opacity: .16; animation: emoPulse 3.2s ease-in-out infinite; }
-      .emo-glyph { font-size: 3.6px; opacity: .55; animation: emoPulse 3.2s ease-in-out infinite; }
-      @keyframes netFire {
-        0%   { stroke-dashoffset: 12; opacity: .12; }
-        50%  { stroke-dashoffset: 0; opacity: .42; }
-        100% { stroke-dashoffset: -12; opacity: .12; }
-      }
-      @keyframes emoPulse {
-        0%, 100% { opacity: .18; }
-        50% { opacity: .65; }
-      }
-      @keyframes emoDrift {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-2px); }
-      }
-      @keyframes pulseTravel {
-        0%   { stroke-dashoffset: 34; opacity: .12; }
-        45%  { opacity: .55; }
-        50%  { stroke-dashoffset: 0; opacity: .62; }
+      @keyframes synapseFire {
+        0%   { stroke-dashoffset: 40; opacity: .10; }
+        45%  { opacity: .5; }
+        50%  { stroke-dashoffset: 0; opacity: .55; }
         55%  { opacity: .5; }
-        100% { stroke-dashoffset: -34; opacity: .12; }
+        100% { stroke-dashoffset: -40; opacity: .10; }
       }
       @keyframes neuronFire {
-        0%, 100% { opacity: .3; r: .7; }
-        50% { opacity: 1; r: 1.15; filter: drop-shadow(0 0 3px rgba(var(--accent-glow),1)); }
+        0%, 100% { opacity: .35; r: .55; }
+        50% { opacity: 1; r: .95; filter: drop-shadow(0 0 2.4px rgba(255,94,174,.95)); }
       }
-      @keyframes brainPulse {
-        0%, 100% { fill-opacity: .12; stroke-opacity: .6; }
-        50% { fill-opacity: .24; stroke-opacity: 1; }
-      }
-      @keyframes foldGlow {
-        0%, 100% { opacity: .3; }
-        50% { opacity: .75; }
-      }
-      /* Keep real app content above the nervous-system layer */
+      /* Keep real app content above the neuron layer */
       .block-container, [data-testid="stHeader"] { position: relative; z-index: 1; }
     </style>
     <svg width="0" height="0">
       <defs>
-        <linearGradient id="nerveGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="synapseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:var(--accent)"/>
           <stop offset="35%" stop-color="#ff8fd6"/>
           <stop offset="65%" stop-color="#7ee0ff"/>
           <stop offset="100%" stop-color="#ffe08a"/>
         </linearGradient>
-        <radialGradient id="brainFill" cx="50%" cy="35%" r="65%">
-          <stop offset="0%" stop-color="var(--accent)"/>
-          <stop offset="100%" stop-color="#7ee0ff" stop-opacity="0"/>
-        </radialGradient>
       </defs>
     </svg>
     """,
@@ -822,28 +669,6 @@ tab_analyze, tab_eda, tab_models, tab_leaderboard, tab_about = st.tabs(
 # TAB 1 — Live Analyzer (original inference flow, untouched logic)
 # ---------------------------------------------------------------------------
 with tab_analyze:
-    st.markdown(
-        '<div class="glass"><div class="glass-header"><span class="icon">💡</span>'
-        '<span class="glass-title">Try an example</span></div>'
-        '<div class="glass-sub">Tap any sample post below to load it into the analyzer.</div>',
-        unsafe_allow_html=True,
-    )
-    ex_cols = st.columns(4, gap="small")
-    for col, key in zip(ex_cols, [1, 0, -1, -2]):
-        ex_info = sentiment_info(key)
-        with col:
-            st.markdown(
-                f'<div style="text-align:center;font-weight:700;color:{ex_info["color"]};'
-                f'font-size:.85rem;margin-bottom:.4rem;">{ex_info["emoji"]} {ex_info["name"]}</div>',
-                unsafe_allow_html=True,
-            )
-            for i, sample in enumerate(EXAMPLE_STATEMENTS[key]):
-                short = sample if len(sample) <= 58 else sample[:55] + "…"
-                if st.button(short, key=f"example_{key}_{i}", use_container_width=True):
-                    st.session_state.analyzer_text_area = sample
-                    st.rerun()
-    st.markdown('</div>', unsafe_allow_html=True)
-
     with st.container(border=False):
         st.markdown('<div class="glass"><div class="glass-header"><span class="icon">💬</span>'
                     '<span class="eyebrow" style="font-size:.72rem;">Your text</span></div>', unsafe_allow_html=True)
@@ -862,7 +687,7 @@ with tab_analyze:
         st.markdown('</div>', unsafe_allow_html=True)
 
     if cleared:
-        st.session_state.analyzer_text_area = ""
+        st.session_state.clear_requested = True
         st.session_state.last_result = None
         st.session_state.theme_color = RESTING_COLOR
         st.session_state.theme_glow = RESTING_GLOW
