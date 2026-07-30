@@ -156,8 +156,8 @@ if "theme_color" not in st.session_state:
     st.session_state.theme_color = RESTING_COLOR
     st.session_state.theme_glow = RESTING_GLOW
     st.session_state.last_result = None  # (text, label, probabilities, classes, tokens)
-if "example_text" not in st.session_state:
-    st.session_state.example_text = ""
+if "analyzer_text_area" not in st.session_state:
+    st.session_state.analyzer_text_area = ""
 
 
 def sentiment_info(label) -> dict:
@@ -587,6 +587,23 @@ NERVE_TRUNKS_RIGHT = [
 ]
 
 
+NETWORK_NODES = [
+    (35, 12), (45, 10), (55, 11), (65, 14), (30, 20), (42, 22), (58, 21),
+    (70, 20), (36, 30), (50, 32), (64, 30), (40, 40), (60, 40), (50, 44),
+]
+NETWORK_EDGES = (
+    [(i, (i + 1) % len(NETWORK_NODES)) for i in range(len(NETWORK_NODES))]
+    + [(i, (i + 4) % len(NETWORK_NODES)) for i in range(len(NETWORK_NODES))]
+)
+
+# Four fixed markers — one per emotion class — pulsing in their own true
+# sentiment colour (independent of the live accent) so the background always
+# reads as "the four human emotions" this model was trained to recognise.
+EMOTION_MARKERS = [
+    (14, 52, 1), (86, 52, 0), (14, 122, -1), (86, 122, -2),
+]
+
+
 def _mirror(points):
     return [(100 - x, y) for x, y in points]
 
@@ -599,7 +616,10 @@ def _polyline_d(points):
 
 
 def _build_neural_bg() -> str:
-    """Fixed-position SVG of a brain, spinal cord, and branching nerves with travelling signal pulses."""
+    """Fixed-position SVG blending a brain, an internal neural-network mesh,
+    a spinal cord with branching peripheral nerves, and four pulsing
+    emotion markers — brain + neural net + nervous system + human emotion,
+    all in one living diagram."""
     fold_paths = "".join(f'<path class="fold" d="{d}"/>' for d in BRAIN_FOLDS)
 
     nerve_paths = []
@@ -620,14 +640,36 @@ def _build_neural_bg() -> str:
                     f'<path class="twig" d="{_polyline_d(twig)}" style="animation-delay:{(delay + 0.3):.2f}s"/>'
                 )
 
+    net_edges = "".join(
+        f'<line class="net-edge" x1="{NETWORK_NODES[a][0]}" y1="{NETWORK_NODES[a][1]}" '
+        f'x2="{NETWORK_NODES[b][0]}" y2="{NETWORK_NODES[b][1]}" '
+        f'style="animation-delay:{((a + b) * 0.21) % 4:.2f}s"/>'
+        for a, b in NETWORK_EDGES
+    )
+    net_nodes = "".join(
+        f'<circle class="net-node" cx="{x}" cy="{y}" r="0.6" style="animation-delay:{(i * 0.33) % 3.6:.2f}s"/>'
+        for i, (x, y) in enumerate(NETWORK_NODES)
+    )
+
+    emo_markers = "".join(
+        f'<g class="emo-marker" style="--ex:{x}; --ey:{y}; animation-delay:{abs(label) * 0.4:.2f}s">'
+        f'<circle class="emo-halo" cx="{x}" cy="{y}" r="3.4" fill="{sentiment_info(label)["color"]}"/>'
+        f'<text class="emo-glyph" x="{x}" y="{y + 1.3}" text-anchor="middle">{sentiment_info(label)["mood"]}</text>'
+        f'</g>'
+        for x, y, label in EMOTION_MARKERS
+    )
+
     return f'''
     <div class="neural-bg">
         <svg viewBox="0 0 100 170" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <g class="emo-markers">{emo_markers}</g>
             <g class="nerves">{''.join(nerve_paths)}</g>
             <g class="twigs">{''.join(twig_paths)}</g>
             <path class="spine" d="{SPINE_D}"/>
             <path class="brain-outline" d="{BRAIN_PATH}"/>
             <g class="brain-folds">{fold_paths}</g>
+            <g class="net-edges">{net_edges}</g>
+            <g class="net-nodes">{net_nodes}</g>
             <g class="ganglia">{''.join(ganglia)}</g>
         </svg>
     </div>
@@ -673,6 +715,32 @@ st.markdown(
         fill: var(--accent); opacity: .5;
         filter: drop-shadow(0 0 1.6px rgba(var(--accent-glow),.9));
         animation: neuronFire 3.4s ease-in-out infinite;
+      }
+      .net-edge {
+        stroke: url(#nerveGrad); stroke-width: .14; opacity: .3;
+        stroke-dasharray: 1.4 1.6;
+        animation: netFire 3s linear infinite;
+      }
+      .net-node {
+        fill: #ffe08a; opacity: .45;
+        filter: drop-shadow(0 0 1.2px rgba(var(--accent-glow),.8));
+        animation: neuronFire 2.8s ease-in-out infinite;
+      }
+      .emo-marker { transform-box: fill-box; transform-origin: center; animation: emoDrift 6s ease-in-out infinite; }
+      .emo-halo { opacity: .16; animation: emoPulse 3.2s ease-in-out infinite; }
+      .emo-glyph { font-size: 3.6px; opacity: .55; animation: emoPulse 3.2s ease-in-out infinite; }
+      @keyframes netFire {
+        0%   { stroke-dashoffset: 12; opacity: .12; }
+        50%  { stroke-dashoffset: 0; opacity: .42; }
+        100% { stroke-dashoffset: -12; opacity: .12; }
+      }
+      @keyframes emoPulse {
+        0%, 100% { opacity: .18; }
+        50% { opacity: .65; }
+      }
+      @keyframes emoDrift {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-2px); }
       }
       @keyframes pulseTravel {
         0%   { stroke-dashoffset: 34; opacity: .12; }
@@ -772,7 +840,7 @@ with tab_analyze:
             for i, sample in enumerate(EXAMPLE_STATEMENTS[key]):
                 short = sample if len(sample) <= 58 else sample[:55] + "…"
                 if st.button(short, key=f"example_{key}_{i}", use_container_width=True):
-                    st.session_state.example_text = sample
+                    st.session_state.analyzer_text_area = sample
                     st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -781,7 +849,6 @@ with tab_analyze:
                     '<span class="eyebrow" style="font-size:.72rem;">Your text</span></div>', unsafe_allow_html=True)
         text = st.text_area(
             "Text to analyse",
-            value=st.session_state.example_text,
             placeholder="Write or paste a message here… e.g. \"I've been feeling a lot lighter lately, things are looking up.\"",
             height=190,
             label_visibility="collapsed",
@@ -795,7 +862,7 @@ with tab_analyze:
         st.markdown('</div>', unsafe_allow_html=True)
 
     if cleared:
-        st.session_state.example_text = ""
+        st.session_state.analyzer_text_area = ""
         st.session_state.last_result = None
         st.session_state.theme_color = RESTING_COLOR
         st.session_state.theme_glow = RESTING_GLOW
@@ -812,7 +879,6 @@ with tab_analyze:
             # rerun so every panel (buttons, neurons, synapses, headings) relights.
             st.session_state.theme_color = info["color"]
             st.session_state.theme_glow = info["glow"]
-            st.session_state.example_text = text
             st.session_state.last_result = {
                 "text": text,
                 "label": label,
