@@ -250,10 +250,6 @@ st.markdown(
 
       html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-      @keyframes auroraDrift {
-        0%,100% { background-position: 10% 0%, 90% 10%, 50% 100%, 0 0; }
-        50% { background-position: 16% 6%, 84% 4%, 44% 94%, 0 0; }
-      }
       .stApp {
         background:
           radial-gradient(circle at 8% 4%, rgba(var(--accent-glow),.32) 0, transparent 32%),
@@ -262,8 +258,6 @@ st.markdown(
           radial-gradient(circle at 15% 92%, rgba(var(--accent-glow),.22) 0, transparent 38%),
           radial-gradient(circle at 50% 45%, rgba(168,120,255,.20) 0, transparent 46%),
           linear-gradient(160deg, #12081f 0%, #0d1430 40%, #071626 75%, #0a0f22 100%);
-        background-size: 150% 150%, 150% 150%, 150% 150%, 150% 150%, 160% 160%, 100% 100%;
-        animation: auroraDrift 18s ease-in-out infinite;
         color: #f2f0ff;
         transition: background 1s ease;
       }
@@ -369,27 +363,24 @@ st.markdown(
         position:relative; overflow:hidden;
         background:
           linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,0) 30%),
-          linear-gradient(145deg, rgba(58,46,96,.55), rgba(14,16,36,.72));
+          linear-gradient(145deg, rgba(58,46,96,.72), rgba(14,16,36,.88));
         border: 1px solid rgba(255,255,255,.16);
         border-radius: 26px; padding: 1.5rem;
         box-shadow:
           0 2px 0 rgba(255,255,255,.10) inset,
-          0 -18px 40px rgba(0,0,0,.30) inset,
-          0 18px 42px rgba(10,4,24,.45),
-          0 3px 10px rgba(0,0,0,.35);
-        backdrop-filter: blur(9px) saturate(130%);
-        -webkit-backdrop-filter: blur(9px) saturate(130%);
+          0 16px 34px rgba(10,4,24,.4),
+          0 3px 8px rgba(0,0,0,.3);
         margin-bottom: 1.2rem;
-        transition: transform .12s ease-out, box-shadow .35s ease, border-color .35s ease;
+        transition: transform .2s ease, box-shadow .3s ease, border-color .3s ease;
       }
       .glass:hover {
+        transform: translateY(-3px);
         border-color: rgba(var(--accent-glow),.55);
         box-shadow:
           0 2px 0 rgba(255,255,255,.14) inset,
-          0 -18px 40px rgba(0,0,0,.28) inset,
-          0 30px 70px rgba(10,4,24,.55),
+          0 22px 46px rgba(10,4,24,.5),
           0 0 0 1px rgba(var(--accent-glow),.22),
-          0 0 46px rgba(var(--accent-glow),.28);
+          0 0 32px rgba(var(--accent-glow),.24);
       }
       .glass::before {
         content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
@@ -477,11 +468,6 @@ st.markdown(
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
       }
-      @keyframes btnPulseRing {
-        0% { box-shadow: 0 0 0 0 rgba(var(--accent-glow),.55), 0 8px 30px rgba(88,101,242,.4); }
-        70% { box-shadow: 0 0 0 12px rgba(var(--accent-glow),0), 0 8px 30px rgba(88,101,242,.4); }
-        100% { box-shadow: 0 0 0 0 rgba(var(--accent-glow),0), 0 8px 30px rgba(88,101,242,.4); }
-      }
       @keyframes btnScan {
         0% { transform: translateX(-120%) skewX(-20deg); }
         100% { transform: translateX(220%) skewX(-20deg); }
@@ -497,9 +483,9 @@ st.markdown(
           linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 46%),
           linear-gradient(100deg, rgba(176,107,255,.55), rgba(var(--accent-glow),.55), rgba(34,227,255,.55), rgba(255,224,138,.5), rgba(176,107,255,.55));
         background-size: 100% 100%, 320% auto;
-        backdrop-filter: blur(16px) saturate(160%);
-        -webkit-backdrop-filter: blur(16px) saturate(160%);
-        animation: btnGradientFlow 5s ease-in-out infinite, btnPulseRing 3.2s ease-in-out infinite;
+        backdrop-filter: blur(8px) saturate(140%);
+        -webkit-backdrop-filter: blur(8px) saturate(140%);
+        animation: btnGradientFlow 6s ease-in-out infinite;
         box-shadow:
           0 1px 0 rgba(255,255,255,.5) inset,
           0 -10px 20px rgba(0,0,0,.22) inset,
@@ -673,8 +659,6 @@ def _build_neural_bg() -> str:
     circles = "".join(
         f'<circle class="neuron depth-{i % 3}" cx="{x}" cy="{y}" '
         f'r="{0.22 + (i % 3) * 0.09}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
-        f'<circle class="neuron-core depth-{i % 3}" cx="{x - 0.09}" cy="{y - 0.09}" '
-        f'r="{0.07 + (i % 3) * 0.02}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
         for i, (x, y) in enumerate(NEURON_POSITIONS)
     )
     lines = "".join(
@@ -714,13 +698,9 @@ st.markdown(
       .neural-bg {
         position: fixed; inset: 0; width: 100vw; height: 100vh;
         z-index: 0; pointer-events: none; overflow: hidden;
-        perspective: 1200px;
       }
       .neural-bg-inner {
-        position: absolute; inset: -4%; width: 108%; height: 108%;
-        transform-style: preserve-3d;
-        transition: transform .3s ease-out;
-        will-change: transform;
+        position: absolute; inset: 0; width: 100%; height: 100%;
       }
       .neural-bg svg { width: 100%; height: 100%; }
 
@@ -730,41 +710,29 @@ st.markdown(
         opacity: .22;
         stroke-dasharray: 2 4;
         stroke-linecap: round;
-        animation: synapseFire 4.5s linear infinite;
+        animation: synapseFire 4.5s ease-in-out infinite;
       }
-      /* Outer sphere body — soft 3D falloff via radial gradient fill */
+      /* Soft 3D falloff via radial-gradient fill instead of per-element filters */
       .neuron {
         fill: url(#neuronSphere);
         animation: neuronFire 3.6s ease-in-out infinite;
       }
-      .neuron.depth-0 { opacity: .28; filter: blur(.35px) drop-shadow(0 0 1px rgba(var(--accent-glow),.5)); }
-      .neuron.depth-1 { opacity: .5; filter: drop-shadow(0 0 1.6px rgba(var(--accent-glow),.7)); }
-      .neuron.depth-2 { opacity: .8; filter: drop-shadow(0 0 3px rgba(var(--accent-glow),.95)); }
-      /* Bright specular highlight offset toward upper-left = 3D sphere look */
-      .neuron-core {
-        fill: #ffffff;
-        animation: neuronFire 3.6s ease-in-out infinite;
-      }
-      .neuron-core.depth-0 { opacity: .22; }
-      .neuron-core.depth-1 { opacity: .4; }
-      .neuron-core.depth-2 { opacity: .65; }
+      .neuron.depth-0 { opacity: .3; }
+      .neuron.depth-1 { opacity: .55; }
+      .neuron.depth-2 { opacity: .85; }
 
       .pulse-spark {
         fill: #ffffff;
-        filter: drop-shadow(0 0 3px rgba(var(--accent-glow),1)) drop-shadow(0 0 6px rgba(255,255,255,.8));
-        opacity: .9;
+        opacity: .85;
       }
 
       @keyframes synapseFire {
-        0%   { stroke-dashoffset: 30; opacity: .12; }
-        45%  { opacity: .55; }
-        50%  { stroke-dashoffset: 0; opacity: .62; }
-        55%  { opacity: .55; }
-        100% { stroke-dashoffset: -30; opacity: .12; }
+        0%, 100% { opacity: .12; }
+        50% { opacity: .6; }
       }
       @keyframes neuronFire {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.35); }
+        0%, 100% { opacity: .5; }
+        50% { opacity: 1; }
       }
       /* Keep real app content above the neuron layer */
       .block-container, [data-testid="stHeader"] { position: relative; z-index: 1; }
@@ -788,75 +756,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 st.markdown(_build_neural_bg(), unsafe_allow_html=True)
-
-# ---------------------------------------------------------------------------
-# Dynamic reactivity: mouse-driven 3D parallax for the neural backdrop, plus a
-# lightweight tilt effect on every glass panel. Throttled via requestAnimationFrame
-# and wired up through a MutationObserver (rather than a polling timer) to stay
-# smooth and avoid the scroll/interaction lag a setInterval loop would cause.
-# Skipped entirely on touch devices / reduced-motion preferences.
-# ---------------------------------------------------------------------------
-st.markdown(
-    """
-    <script>
-    (function() {
-      const doc = window.parent ? window.parent.document : document;
-      const win = window.parent || window;
-
-      const isCoarsePointer = win.matchMedia && win.matchMedia('(pointer: coarse)').matches;
-      const reducedMotion = win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (isCoarsePointer || reducedMotion) return;
-
-      let ticking = false;
-      let lastEvent = null;
-
-      function applyEffects() {
-        ticking = false;
-        if (!lastEvent) return;
-        const e = lastEvent;
-
-        const bgInner = doc.getElementById('neuralBgInner');
-        if (bgInner) {
-          const nx = (e.clientX / win.innerWidth - 0.5) * 2;
-          const ny = (e.clientY / win.innerHeight - 0.5) * 2;
-          bgInner.style.transform =
-            'rotateY(' + (nx * 4).toFixed(2) + 'deg) rotateX(' + (-ny * 4).toFixed(2) + 'deg)';
-        }
-
-        const hovered = e.target && e.target.closest ? e.target.closest('.glass') : null;
-        doc.querySelectorAll('.glass[data-tilting]').forEach((card) => {
-          if (card !== hovered) {
-            card.style.transform = '';
-            card.removeAttribute('data-tilting');
-          }
-        });
-        if (hovered) {
-          hovered.setAttribute('data-tilting', '1');
-          const rect = hovered.getBoundingClientRect();
-          const px = (e.clientX - rect.left) / rect.width - 0.5;
-          const py = (e.clientY - rect.top) / rect.height - 0.5;
-          hovered.style.transform =
-            'perspective(900px) rotateX(' + (-py * 5).toFixed(2) + 'deg) rotateY(' + (px * 5).toFixed(2) + 'deg) translateY(-3px)';
-        }
-      }
-
-      function onMouseMove(e) {
-        lastEvent = e;
-        if (!ticking) {
-          ticking = true;
-          win.requestAnimationFrame(applyEffects);
-        }
-      }
-
-      if (!doc.body.dataset.neuropulseWired) {
-        doc.body.dataset.neuropulseWired = '1';
-        doc.addEventListener('mousemove', onMouseMove, { passive: true });
-      }
-    })();
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
 
 _live = st.session_state.last_result
 _live_info = sentiment_info(_live["label"]) if _live else {
