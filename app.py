@@ -314,8 +314,18 @@ st.markdown(
         font-size: .8rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
       }
       @keyframes titleDrift3d {
-        0%,100% { transform: perspective(900px) rotateX(4deg) rotateY(-1.5deg); }
-        50% { transform: perspective(900px) rotateX(2deg) rotateY(1.5deg); }
+        0%   { transform: perspective(900px) rotateX(4deg) rotateY(-1.5deg) scale(1); }
+        40%  { transform: perspective(900px) rotateX(2deg) rotateY(1.5deg) scale(1); }
+        78%  { transform: perspective(900px) rotateX(2deg) rotateY(1deg) scale(1); }
+        86%  { transform: perspective(900px) rotateX(2deg) rotateY(1deg) scale(1.045); }
+        93%  { transform: perspective(900px) rotateX(2deg) rotateY(1deg) scale(.985); }
+        100% { transform: perspective(900px) rotateX(4deg) rotateY(-1.5deg) scale(1); }
+      }
+      @keyframes titlePopIn {
+        0%   { transform: scale(.3) rotate(-4deg); opacity: 0; }
+        55%  { transform: scale(1.14) rotate(1.5deg); opacity: 1; }
+        75%  { transform: scale(.94) rotate(-.5deg); }
+        100% { transform: scale(1) rotate(0deg); }
       }
       .title-wrap {
         display:inline-block; position:relative; padding: .6rem 1.2rem .7rem;
@@ -324,7 +334,9 @@ st.markdown(
         border: 1px solid rgba(255,255,255,.14);
         backdrop-filter: blur(10px);
         box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 24px 60px rgba(10,4,24,.5);
-        animation: titleDrift3d 7s ease-in-out infinite;
+        animation:
+          titlePopIn .85s cubic-bezier(.34,1.56,.64,1) both,
+          titleDrift3d 6.5s ease-in-out .85s infinite;
         transform-style: preserve-3d;
       }
       h1 {
@@ -891,21 +903,6 @@ with tab_analyze:
         st.markdown('<div class="glass"><div class="glass-header"><span class="icon">💬</span>'
                     '<span class="eyebrow" style="font-size:.72rem;">Your text</span></div>', unsafe_allow_html=True)
 
-        uploaded_txt = st.file_uploader(
-            "Or drag & drop a .txt file to auto-fill the box below",
-            type=["txt", "md"],
-            key="analyzer_file_uploader",
-            help="Drag & drop a text file here, or click to browse — its contents will fill the box below.",
-        )
-        if uploaded_txt is not None and st.session_state.get("_analyzer_last_file") != uploaded_txt.name:
-            try:
-                file_text = uploaded_txt.read().decode("utf-8", errors="ignore")
-            except Exception:  # noqa: BLE001
-                file_text = ""
-            st.session_state.analyzer_text_area = file_text
-            st.session_state._analyzer_last_file = uploaded_txt.name
-            st.rerun()
-
         text = st.text_area(
             "Text to analyse",
             placeholder="Write or paste a message here… e.g. \"I've been feeling a lot lighter lately, things are looking up.\"",
@@ -923,10 +920,10 @@ with tab_analyze:
     if cleared:
         st.session_state.clear_requested = True
         st.session_state.last_result = None
-        st.session_state._analyzer_last_file = None
         st.session_state.theme_color = RESTING_COLOR
         st.session_state.theme_glow = RESTING_GLOW
         st.rerun()
+
 
     # Auto-revert the whole site's live theme the moment the box is emptied —
     # whether that happened via the Clear button above or by the person simply
