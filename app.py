@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 import json
 import pickle
 import re
@@ -9,6 +10,7 @@ from pathlib import Path
 
 import nltk
 import numpy as np
+import pandas as pd
 import streamlit as st
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -104,27 +106,54 @@ def predict(text: str):
 
 
 SENTIMENT_MAP = {
-    -2: {"name": "Very Negative", "emoji": "🌩️", "color": "#ff3b3b", "glow": "255,59,59",
-         "blurb": "Signals of significant distress"},
-    -1: {"name": "Negative", "emoji": "🌧️", "color": "#ff9a3c", "glow": "255,154,60",
-         "blurb": "Signals of mild distress or worry"},
-    0: {"name": "Neutral", "emoji": "🌤️", "color": "#f5d742", "glow": "245,215,66",
-        "blurb": "Balanced, everyday tone"},
-    1: {"name": "Positive", "emoji": "🌈", "color": "#39e26f", "glow": "57,226,111",
-        "blurb": "Signals of hope or wellbeing"},
+    -2: {"name": "Very Negative", "emoji": "🌩️", "color": "#e8798a", "glow": "232,121,138",
+         "blurb": "Signals of significant distress", "mood": "😞"},
+    -1: {"name": "Negative", "emoji": "🌧️", "color": "#e3a869", "glow": "227,168,105",
+         "blurb": "Signals of mild distress or worry", "mood": "😕"},
+    0: {"name": "Neutral", "emoji": "🌤️", "color": "#e0cf72", "glow": "224,207,114",
+        "blurb": "Balanced, everyday tone", "mood": "😐"},
+    1: {"name": "Positive", "emoji": "🌈", "color": "#7fd6a8", "glow": "127,214,168",
+        "blurb": "Signals of hope or wellbeing", "mood": "🙂"},
 }
 
-DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#9dafc7", "glow": "157,175,199",
-                      "blurb": "Outside the known intensity scale"}
+DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#a7b8cf", "glow": "167,184,207",
+                      "blurb": "Outside the known intensity scale", "mood": "❔"}
+
+# Sample statements the person can tap to try the analyzer instantly — one
+# gentle, illustrative example per intensity class.
+EXAMPLE_STATEMENTS = {
+    1: [
+        "I finally slept through the night and woke up actually feeling like myself again.",
+        "Talking to my therapist today helped me see how far I've really come.",
+    ],
+    0: [
+        "Went to work, made dinner, watched a show. Pretty ordinary day overall.",
+        "Still figuring out my routine, nothing exciting to report either way.",
+    ],
+    -1: [
+        "I've been feeling kind of low and unmotivated the past few days.",
+        "Work has been overwhelming and I can't seem to shake this worry.",
+    ],
+    -2: [
+        "I feel completely numb and don't see the point in anything anymore.",
+        "Everything feels hopeless right now and I don't know how to keep going.",
+    ],
+}
 
 # ---------------------------------------------------------------------------
 # Live theme state — the whole interface's accent colour tracks the most
 # recently predicted sentiment, like a nervous system reacting to signal.
+# Reverts to a calm resting-state teal whenever the input is cleared.
 # ---------------------------------------------------------------------------
+RESTING_COLOR = "#5fb3c9"
+RESTING_GLOW = "95,179,201"
+
 if "theme_color" not in st.session_state:
-    st.session_state.theme_color = "#22e3ff"
-    st.session_state.theme_glow = "34,227,255"
+    st.session_state.theme_color = RESTING_COLOR
+    st.session_state.theme_glow = RESTING_GLOW
     st.session_state.last_result = None  # (text, label, probabilities, classes, tokens)
+if "example_text" not in st.session_state:
+    st.session_state.example_text = ""
 
 
 def sentiment_info(label) -> dict:
@@ -234,14 +263,15 @@ st.markdown(
       }
       .stApp {
         background:
-          radial-gradient(circle at 10% 0%, rgba(0,224,255,.26) 0, transparent 32%),
-          radial-gradient(circle at 90% 10%, rgba(88,101,242,.24) 0, transparent 30%),
-          radial-gradient(circle at 50% 100%, rgba(56,232,180,.16) 0, transparent 40%),
-          linear-gradient(160deg, #030711 0%, #050b1e 45%, #030a14 100%);
+          radial-gradient(circle at 10% 0%, rgba(var(--accent-glow),.14) 0, transparent 34%),
+          radial-gradient(circle at 90% 10%, rgba(120,146,196,.14) 0, transparent 32%),
+          radial-gradient(circle at 50% 100%, rgba(127,214,168,.10) 0, transparent 42%),
+          linear-gradient(160deg, #10161f 0%, #131b28 45%, #0f1620 100%);
         background-size: 140% 140%, 140% 140%, 140% 140%, 100% 100%;
-        animation: auroraDrift 16s ease-in-out infinite;
-        color: #eef5ff;
+        animation: auroraDrift 22s ease-in-out infinite;
+        color: #e9eef5;
         background-attachment: fixed;
+        transition: background 1.2s ease;
       }
       [data-testid="stHeader"] { background: transparent; }
       .block-container { max-width: 1220px; padding-top: 2.6rem; padding-bottom: 4rem; }
@@ -283,10 +313,10 @@ st.markdown(
 
       .glass {
         position:relative; overflow:hidden;
-        background: linear-gradient(145deg, rgba(15,25,55,.55), rgba(8,12,28,.75));
-        border: 1px solid rgba(88,101,242,.28);
+        background: linear-gradient(145deg, rgba(28,38,52,.55), rgba(18,24,34,.72));
+        border: 1px solid rgba(140,160,190,.18);
         border-radius: 26px; padding: 1.5rem;
-        box-shadow: 0 20px 70px rgba(13,60,110,.2), inset 0 1px 0 rgba(255,255,255,.04);
+        box-shadow: 0 16px 50px rgba(10,20,35,.22), inset 0 1px 0 rgba(255,255,255,.03);
         backdrop-filter: blur(14px);
         margin-bottom: 1.2rem;
         transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
@@ -393,8 +423,8 @@ st.markdown(
         padding: .85rem 1rem;
         font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
         font-weight: 700; font-size: .95rem; letter-spacing: .04em; text-transform: uppercase;
-        color: #04121b;
-        background: linear-gradient(100deg, var(--accent), #5865f2, #7cffb2, var(--accent));
+        color: #0d1620;
+        background: linear-gradient(100deg, var(--accent), #8ea9cf, #a9dcc4, var(--accent));
         background-size: 320% auto;
         animation: btnGradientFlow 5s ease-in-out infinite, btnPulseRing 3.2s ease-in-out infinite;
         transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, filter .25s ease;
@@ -640,17 +670,46 @@ tab_analyze, tab_eda, tab_models, tab_leaderboard, tab_about = st.tabs(
 # TAB 1 — Live Analyzer (original inference flow, untouched logic)
 # ---------------------------------------------------------------------------
 with tab_analyze:
+    st.markdown(
+        '<div class="glass"><div class="glass-header"><span class="icon">💡</span>'
+        '<span class="glass-title">Try an example</span></div>'
+        '<div class="glass-sub">Tap a sample post to load it — one per emotional intensity.</div>',
+        unsafe_allow_html=True,
+    )
+    ex_cols = st.columns(4, gap="small")
+    for col, key in zip(ex_cols, [1, 0, -1, -2]):
+        ex_info = sentiment_info(key)
+        sample = EXAMPLE_STATEMENTS[key][0]
+        with col:
+            if st.button(f"{ex_info['emoji']} {ex_info['name']}", key=f"example_{key}", use_container_width=True):
+                st.session_state.example_text = sample
+                st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
     with st.container(border=False):
         st.markdown('<div class="glass"><div class="glass-header"><span class="icon">💬</span>'
                     '<span class="eyebrow" style="font-size:.72rem;">Your text</span></div>', unsafe_allow_html=True)
         text = st.text_area(
             "Text to analyse",
+            value=st.session_state.example_text,
             placeholder="Write or paste a message here… e.g. \"I've been feeling a lot lighter lately, things are looking up.\"",
             height=190,
             label_visibility="collapsed",
+            key="analyzer_text_area",
         )
-        submitted = st.button("🔮  Analyse emotional signal", type="primary")
+        btn_col1, btn_col2 = st.columns([3, 1], gap="small")
+        with btn_col1:
+            submitted = st.button("🔮  Analyse emotional signal", type="primary", use_container_width=True)
+        with btn_col2:
+            cleared = st.button("🌙  Clear", use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
+
+    if cleared:
+        st.session_state.example_text = ""
+        st.session_state.last_result = None
+        st.session_state.theme_color = RESTING_COLOR
+        st.session_state.theme_glow = RESTING_GLOW
+        st.rerun()
 
     if submitted:
         if not text.strip():
@@ -663,6 +722,7 @@ with tab_analyze:
             # rerun so every panel (buttons, neurons, synapses, headings) relights.
             st.session_state.theme_color = info["color"]
             st.session_state.theme_glow = info["glow"]
+            st.session_state.example_text = text
             st.session_state.last_result = {
                 "text": text,
                 "label": label,
@@ -722,6 +782,97 @@ with tab_analyze:
                 st.caption("The tokens below follow the preprocessing pipeline used in the notebook.")
                 st.code(" ".join(tokens) if tokens else "No recognised tokens", language=None)
 
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown(
+        '''<div class="glass">
+            <div class="glass-header"><span class="icon">📦</span><span class="glass-title">Batch analysis — upload a CSV</span></div>
+            <div class="glass-sub">Upload a CSV with a text column and NeuroPulse will score every row's emotional intensity in one pass.</div>
+        </div>''',
+        unsafe_allow_html=True,
+    )
+
+    uploaded_csv = st.file_uploader(
+        "Upload CSV for batch prediction", type=["csv"], label_visibility="collapsed", key="batch_csv_uploader"
+    )
+
+    if uploaded_csv is not None:
+        try:
+            batch_df = pd.read_csv(uploaded_csv)
+        except Exception as exc:  # noqa: BLE001
+            st.error(f"Couldn't read that CSV: {exc}")
+            batch_df = None
+
+        if batch_df is not None and not batch_df.empty:
+            text_columns = [c for c in batch_df.columns if batch_df[c].dtype == object] or list(batch_df.columns)
+            default_idx = 0
+            for guess in ("text", "post", "message", "content", "input"):
+                if guess in [c.lower() for c in text_columns]:
+                    default_idx = [c.lower() for c in text_columns].index(guess)
+                    break
+            text_col = st.selectbox(
+                "Which column holds the text to analyse?", options=text_columns, index=default_idx,
+                key="batch_text_col",
+            )
+            run_batch = st.button("⚡ Run batch analysis", type="primary", key="run_batch_btn")
+
+            if run_batch:
+                rows = batch_df[text_col].astype(str).tolist()
+                labels, moods, emojis, confidences = [], [], [], []
+                progress = st.progress(0.0, text="🧠 Signals travelling through the network…")
+                for i, row_text in enumerate(rows):
+                    if row_text.strip():
+                        label, probabilities, _, _ = predict(row_text)
+                        info = sentiment_info(label)
+                        labels.append(label)
+                        moods.append(info["name"])
+                        emojis.append(info["emoji"])
+                        confidences.append(float(np.max(probabilities)))
+                    else:
+                        labels.append(None)
+                        moods.append("—")
+                        emojis.append("❔")
+                        confidences.append(None)
+                    progress.progress((i + 1) / max(len(rows), 1))
+                progress.empty()
+
+                results_df = batch_df.copy()
+                results_df["predicted_intensity"] = labels
+                results_df["predicted_sentiment"] = moods
+                results_df["emoji"] = emojis
+                results_df["confidence"] = confidences
+
+                st.session_state.batch_results = results_df.to_csv(index=False)
+                st.session_state.batch_results_display = results_df
+
+            if "batch_results_display" in st.session_state:
+                results_df = st.session_state.batch_results_display
+                st.markdown("<br>", unsafe_allow_html=True)
+
+                summary_counts = results_df["predicted_sentiment"].value_counts()
+                summary_cols = st.columns(4, gap="small")
+                for col, key in zip(summary_cols, [1, 0, -1, -2]):
+                    info = sentiment_info(key)
+                    n = int(summary_counts.get(info["name"], 0))
+                    with col:
+                        st.markdown(
+                            f'''<div class="glass signal-card" style="padding:.9rem; --glow-color: rgba({info["glow"]},.6);">
+                                <div style="font-size:1.6rem;">{info["emoji"]}</div>
+                                <div style="font-weight:700;color:{info["color"]};margin:.15rem 0;font-size:.9rem;">{info["name"]}</div>
+                                <div class="caption">{n} post{'s' if n != 1 else ''}</div>
+                            </div>''',
+                            unsafe_allow_html=True,
+                        )
+
+                st.markdown("<br>", unsafe_allow_html=True)
+                st.dataframe(results_df, use_container_width=True, height=360)
+                st.download_button(
+                    "⬇️ Download predictions as CSV",
+                    data=st.session_state.batch_results,
+                    file_name="neuropulse_batch_predictions.csv",
+                    mime="text/csv",
+                    use_container_width=True,
+                )
+
 # ---------------------------------------------------------------------------
 # TAB 2 — Dataset & EDA
 # ---------------------------------------------------------------------------
@@ -730,6 +881,12 @@ with tab_eda:
         f'''<div class="glass">
             <div class="glass-header"><span class="icon">📡</span><span class="glass-title">Dataset snapshot</span></div>
             <div class="glass-sub">Mental-health forum posts, labelled by intensity from −2 (very negative) to 1 (positive).</div>
+            <div class="chip-row" style="margin:.2rem 0 1rem;">
+                <span class="chip">🌩️😞 Very Negative</span>
+                <span class="chip">🌧️😕 Negative</span>
+                <span class="chip">🌤️😐 Neutral</span>
+                <span class="chip">🌈🙂 Positive</span>
+            </div>
             <div class="stat-grid">
                 <div class="stat-card"><div class="stat-num">{DATASET_STATS['raw_rows']:,}</div><div class="stat-lbl">Raw rows</div></div>
                 <div class="stat-card"><div class="stat-num">{DATASET_STATS['clean_rows']:,}</div><div class="stat-lbl">After cleaning</div></div>
