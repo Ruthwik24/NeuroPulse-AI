@@ -125,10 +125,12 @@ DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#a7b8cf",
 # ---------------------------------------------------------------------------
 # Live theme state — the whole interface's accent colour tracks the most
 # recently predicted sentiment, like a nervous system reacting to signal.
-# Reverts to a resting-state "Electric Amethyst" whenever the input is cleared.
+# Reverts to a resting-state "Quantum Coral" whenever the input is cleared —
+# a vivid coral-pink accent that still plays against the aurora's blues,
+# violets and golds for a colourful, unique combo rather than one flat hue.
 # ---------------------------------------------------------------------------
-RESTING_COLOR = "#b06bff"
-RESTING_GLOW = "176,107,255"
+RESTING_COLOR = "#ff5eae"
+RESTING_GLOW = "255,94,174"
 
 if "theme_color" not in st.session_state:
     st.session_state.theme_color = RESTING_COLOR
@@ -254,20 +256,45 @@ st.markdown(
       }
       .stApp {
         background:
-          radial-gradient(circle at 8% 4%, rgba(255,110,180,.30) 0, transparent 32%),
-          radial-gradient(circle at 92% 8%, rgba(96,180,255,.32) 0, transparent 34%),
-          radial-gradient(circle at 76% 88%, rgba(255,196,64,.24) 0, transparent 36%),
-          radial-gradient(circle at 15% 92%, rgba(120,255,180,.24) 0, transparent 38%),
+          radial-gradient(circle at 8% 4%, rgba(var(--accent-glow),.32) 0, transparent 32%),
+          radial-gradient(circle at 92% 8%, rgba(96,180,255,.30) 0, transparent 34%),
+          radial-gradient(circle at 76% 88%, rgba(255,196,64,.22) 0, transparent 36%),
+          radial-gradient(circle at 15% 92%, rgba(var(--accent-glow),.22) 0, transparent 38%),
           radial-gradient(circle at 50% 45%, rgba(168,120,255,.20) 0, transparent 46%),
           linear-gradient(160deg, #12081f 0%, #0d1430 40%, #071626 75%, #0a0f22 100%);
         background-size: 150% 150%, 150% 150%, 150% 150%, 150% 150%, 160% 160%, 100% 100%;
         animation: auroraDrift 18s ease-in-out infinite;
         color: #f2f0ff;
-        background-attachment: fixed;
-        transition: background 1.2s ease;
+        transition: background 1s ease;
       }
       [data-testid="stHeader"] { background: transparent; }
       .block-container { max-width: 1220px; padding-top: 2.6rem; padding-bottom: 4rem; }
+
+      /* Responsive layout — phones, tablets, laptops, desktops */
+      @media (max-width: 900px) {
+        .block-container { max-width: 100%; padding-left: 1rem; padding-right: 1rem; padding-top: 1.6rem; }
+        .stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        .model-grid { grid-template-columns: 1fr !important; }
+        .dist-label { flex-basis: 96px !important; font-size: .78rem !important; }
+        .pipe-step { font-size: .74rem !important; padding: .45rem .65rem !important; }
+      }
+      @media (max-width: 560px) {
+        h1 { font-size: 1.7rem !important; }
+        .title-wrap { padding: .45rem .8rem .55rem; border-radius: 16px; }
+        .eyebrow { font-size: .68rem !important; }
+        .chip { font-size: .7rem !important; padding: .28rem .6rem !important; }
+        .glass { padding: 1.05rem !important; border-radius: 18px !important; }
+        .signal-emoji { font-size: 2.6rem !important; }
+        .stat-num { font-size: 1.25rem !important; }
+      }
+      /* Touch devices: skip the pointer-tilt/parallax micro-interactions
+         entirely so the interface stays light and lag-free on phones/tablets */
+      @media (pointer: coarse) {
+        .glass:hover { transform: none !important; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; }
+      }
 
       @keyframes floaty { 0%,100% { transform: translateY(0px);} 50% { transform: translateY(-6px);} }
       @keyframes pulseGlow { 0%,100% { opacity:.55; } 50% { opacity:1; } }
@@ -326,7 +353,6 @@ st.markdown(
         color:#f2ecff; font-size:.8rem; font-weight:600; padding:.35rem .8rem; border-radius:999px;
       }
 
-      .block-container { perspective: 1400px; }
       .glass {
         position:relative; overflow:hidden;
         background:
@@ -339,11 +365,9 @@ st.markdown(
           0 -18px 40px rgba(0,0,0,.30) inset,
           0 18px 42px rgba(10,4,24,.45),
           0 3px 10px rgba(0,0,0,.35);
-        backdrop-filter: blur(18px) saturate(150%);
-        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        backdrop-filter: blur(9px) saturate(130%);
+        -webkit-backdrop-filter: blur(9px) saturate(130%);
         margin-bottom: 1.2rem;
-        transform-style: preserve-3d;
-        will-change: transform;
         transition: transform .12s ease-out, box-shadow .35s ease, border-color .35s ease;
       }
       .glass:hover {
@@ -636,9 +660,9 @@ def _build_neural_bg() -> str:
     # Depth layers: far (small, blurred, dim) → near (large, sharp, bright).
     circles = "".join(
         f'<circle class="neuron depth-{i % 3}" cx="{x}" cy="{y}" '
-        f'r="{0.5 + (i % 3) * 0.22}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
-        f'<circle class="neuron-core depth-{i % 3}" cx="{x - 0.18}" cy="{y - 0.18}" '
-        f'r="{0.16 + (i % 3) * 0.05}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        f'r="{0.22 + (i % 3) * 0.09}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        f'<circle class="neuron-core depth-{i % 3}" cx="{x - 0.09}" cy="{y - 0.09}" '
+        f'r="{0.07 + (i % 3) * 0.02}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
         for i, (x, y) in enumerate(NEURON_POSITIONS)
     )
     lines = "".join(
@@ -650,14 +674,14 @@ def _build_neural_bg() -> str:
     # A travelling "pulse" spark riding along a subset of synapses, giving the
     # impression of an actual signal firing across the network in real time.
     pulses = "".join(
-        f'<circle class="pulse-spark" r="0.85">'
+        f'<circle class="pulse-spark" r="0.32">'
         f'<animateMotion dur="{3 + (i % 4) * 0.8:.1f}s" repeatCount="indefinite" '
         f'begin="{(i * 0.6) % 4:.1f}s" '
         f'path="M{NEURON_POSITIONS[a][0]},{NEURON_POSITIONS[a][1]} '
         f'L{NEURON_POSITIONS[b][0]},{NEURON_POSITIONS[b][1]}"/>'
         f'</circle>'
         for i, (a, b) in enumerate(NEURON_SYNAPSES)
-        if i % 3 == 0
+        if i % 5 == 0
     )
     return f'''
     <div class="neural-bg" id="neuralBg">
@@ -755,49 +779,67 @@ st.markdown(_build_neural_bg(), unsafe_allow_html=True)
 
 # ---------------------------------------------------------------------------
 # Dynamic reactivity: mouse-driven 3D parallax for the neural backdrop, plus a
-# lightweight tilt effect on every glass panel — reattached on every Streamlit
-# rerun since the DOM is replaced each time.
+# lightweight tilt effect on every glass panel. Throttled via requestAnimationFrame
+# and wired up through a MutationObserver (rather than a polling timer) to stay
+# smooth and avoid the scroll/interaction lag a setInterval loop would cause.
+# Skipped entirely on touch devices / reduced-motion preferences.
 # ---------------------------------------------------------------------------
 st.markdown(
     """
     <script>
     (function() {
       const doc = window.parent ? window.parent.document : document;
+      const win = window.parent || window;
 
-      function attachParallax() {
+      const isCoarsePointer = win.matchMedia && win.matchMedia('(pointer: coarse)').matches;
+      const reducedMotion = win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (isCoarsePointer || reducedMotion) return;
+
+      let ticking = false;
+      let lastEvent = null;
+
+      function applyEffects() {
+        ticking = false;
+        if (!lastEvent) return;
+        const e = lastEvent;
+
         const bgInner = doc.getElementById('neuralBgInner');
-        if (bgInner && !bgInner.dataset.wired) {
-          bgInner.dataset.wired = '1';
-          doc.addEventListener('mousemove', (e) => {
-            const nx = (e.clientX / window.innerWidth - 0.5) * 2;
-            const ny = (e.clientY / window.innerHeight - 0.5) * 2;
-            bgInner.style.transform =
-              'rotateY(' + (nx * 4) + 'deg) rotateX(' + (-ny * 4) + 'deg) translateZ(0)';
-          });
+        if (bgInner) {
+          const nx = (e.clientX / win.innerWidth - 0.5) * 2;
+          const ny = (e.clientY / win.innerHeight - 0.5) * 2;
+          bgInner.style.transform =
+            'rotateY(' + (nx * 4).toFixed(2) + 'deg) rotateX(' + (-ny * 4).toFixed(2) + 'deg)';
+        }
+
+        const hovered = e.target && e.target.closest ? e.target.closest('.glass') : null;
+        doc.querySelectorAll('.glass[data-tilting]').forEach((card) => {
+          if (card !== hovered) {
+            card.style.transform = '';
+            card.removeAttribute('data-tilting');
+          }
+        });
+        if (hovered) {
+          hovered.setAttribute('data-tilting', '1');
+          const rect = hovered.getBoundingClientRect();
+          const px = (e.clientX - rect.left) / rect.width - 0.5;
+          const py = (e.clientY - rect.top) / rect.height - 0.5;
+          hovered.style.transform =
+            'perspective(900px) rotateX(' + (-py * 5).toFixed(2) + 'deg) rotateY(' + (px * 5).toFixed(2) + 'deg) translateY(-3px)';
         }
       }
 
-      function attachTilt() {
-        doc.querySelectorAll('.glass:not([data-tilt])').forEach((card) => {
-          card.setAttribute('data-tilt', '1');
-          card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const px = (e.clientX - rect.left) / rect.width - 0.5;
-            const py = (e.clientY - rect.top) / rect.height - 0.5;
-            card.style.transform =
-              'perspective(900px) rotateX(' + (-py * 6) + 'deg) rotateY(' + (px * 6) + 'deg) translateY(-3px)';
-          });
-          card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)';
-          });
-        });
+      function onMouseMove(e) {
+        lastEvent = e;
+        if (!ticking) {
+          ticking = true;
+          win.requestAnimationFrame(applyEffects);
+        }
       }
 
-      attachParallax();
-      attachTilt();
-      // Streamlit re-renders parts of the DOM on every interaction — keep
-      // wiring up any newly mounted elements without duplicating listeners.
-      setInterval(() => { attachParallax(); attachTilt(); }, 800);
+      if (!doc.body.dataset.neuropulseWired) {
+        doc.body.dataset.neuropulseWired = '1';
+        doc.addEventListener('mousemove', onMouseMove, { passive: true });
+      }
     })();
     </script>
     """,
@@ -848,6 +890,22 @@ with tab_analyze:
     with st.container(border=False):
         st.markdown('<div class="glass"><div class="glass-header"><span class="icon">💬</span>'
                     '<span class="eyebrow" style="font-size:.72rem;">Your text</span></div>', unsafe_allow_html=True)
+
+        uploaded_txt = st.file_uploader(
+            "Or drag & drop a .txt file to auto-fill the box below",
+            type=["txt", "md"],
+            key="analyzer_file_uploader",
+            help="Drag & drop a text file here, or click to browse — its contents will fill the box below.",
+        )
+        if uploaded_txt is not None and st.session_state.get("_analyzer_last_file") != uploaded_txt.name:
+            try:
+                file_text = uploaded_txt.read().decode("utf-8", errors="ignore")
+            except Exception:  # noqa: BLE001
+                file_text = ""
+            st.session_state.analyzer_text_area = file_text
+            st.session_state._analyzer_last_file = uploaded_txt.name
+            st.rerun()
+
         text = st.text_area(
             "Text to analyse",
             placeholder="Write or paste a message here… e.g. \"I've been feeling a lot lighter lately, things are looking up.\"",
@@ -864,6 +922,16 @@ with tab_analyze:
 
     if cleared:
         st.session_state.clear_requested = True
+        st.session_state.last_result = None
+        st.session_state._analyzer_last_file = None
+        st.session_state.theme_color = RESTING_COLOR
+        st.session_state.theme_glow = RESTING_GLOW
+        st.rerun()
+
+    # Auto-revert the whole site's live theme the moment the box is emptied —
+    # whether that happened via the Clear button above or by the person simply
+    # deleting the text themselves (backspace / select-all + delete, etc.).
+    if not text.strip() and st.session_state.last_result is not None:
         st.session_state.last_result = None
         st.session_state.theme_color = RESTING_COLOR
         st.session_state.theme_glow = RESTING_GLOW
