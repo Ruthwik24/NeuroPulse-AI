@@ -125,10 +125,10 @@ DEFAULT_SENTIMENT = {"name": "Unclassified", "emoji": "❔", "color": "#a7b8cf",
 # ---------------------------------------------------------------------------
 # Live theme state — the whole interface's accent colour tracks the most
 # recently predicted sentiment, like a nervous system reacting to signal.
-# Reverts to a resting-state "quantum coral" whenever the input is cleared.
+# Reverts to a resting-state "Electric Amethyst" whenever the input is cleared.
 # ---------------------------------------------------------------------------
-RESTING_COLOR = "#ff5eae"
-RESTING_GLOW = "255,94,174"
+RESTING_COLOR = "#b06bff"
+RESTING_GLOW = "176,107,255"
 
 if "theme_color" not in st.session_state:
     st.session_state.theme_color = RESTING_COLOR
@@ -244,7 +244,7 @@ st.markdown(
 st.markdown(
     """
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Audiowide&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
       html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
@@ -286,13 +286,34 @@ st.markdown(
         animation: shimmer 6s linear infinite;
         font-size: .8rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase;
       }
+      @keyframes titleDrift3d {
+        0%,100% { transform: perspective(900px) rotateX(4deg) rotateY(-1.5deg); }
+        50% { transform: perspective(900px) rotateX(2deg) rotateY(1.5deg); }
+      }
+      .title-wrap {
+        display:inline-block; position:relative; padding: .6rem 1.2rem .7rem;
+        border-radius: 22px; margin: .3rem 0 .6rem;
+        background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,0) 40%), rgba(20,16,42,.35);
+        border: 1px solid rgba(255,255,255,.14);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 1px 0 rgba(255,255,255,.12) inset, 0 24px 60px rgba(10,4,24,.5);
+        animation: titleDrift3d 7s ease-in-out infinite;
+        transform-style: preserve-3d;
+      }
       h1 {
-        font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
-        font-size: clamp(2.1rem, 5.2vw, 3.9rem) !important;
-        line-height: 1.08 !important; margin: .5rem 0 .8rem !important; letter-spacing: -.01em;
-        background: linear-gradient(120deg, #ffb3ec 8%, #a789ff 38%, #7ee0ff 66%, var(--accent) 92%);
+        font-family: 'Audiowide', 'Orbitron', 'Space Grotesk', sans-serif !important;
+        font-size: clamp(2rem, 5vw, 3.7rem) !important;
+        line-height: 1.1 !important; margin: 0 !important; letter-spacing: -.005em;
+        background: linear-gradient(120deg, #ffe6ff 4%, #d9c2ff 22%, var(--accent) 46%, #7ee0ff 70%, #ffe08a 92%);
+        background-size: 220% auto;
         -webkit-background-clip: text; background-clip: text; color: transparent;
-        text-shadow: 0 0 34px rgba(var(--accent-glow),.3);
+        animation: shimmer 9s linear infinite;
+        text-shadow:
+          0 1px 0 rgba(255,255,255,.25),
+          0 2px 0 rgba(190,150,255,.18),
+          0 6px 18px rgba(var(--accent-glow),.45),
+          0 14px 40px rgba(0,0,0,.4);
+        filter: drop-shadow(0 0 22px rgba(var(--accent-glow),.35));
       }
       .lead { color: #aab8d4; font-size: 1.06rem; max-width: 760px; line-height: 1.7; }
       .lead .hi { color: var(--accent); font-weight: 600; }
@@ -305,28 +326,46 @@ st.markdown(
         color:#f2ecff; font-size:.8rem; font-weight:600; padding:.35rem .8rem; border-radius:999px;
       }
 
+      .block-container { perspective: 1400px; }
       .glass {
         position:relative; overflow:hidden;
-        background: linear-gradient(145deg, rgba(48,40,80,.5), rgba(18,20,42,.68));
-        border: 1px solid rgba(190,150,255,.22);
+        background:
+          linear-gradient(145deg, rgba(255,255,255,.09), rgba(255,255,255,0) 30%),
+          linear-gradient(145deg, rgba(58,46,96,.55), rgba(14,16,36,.72));
+        border: 1px solid rgba(255,255,255,.16);
         border-radius: 26px; padding: 1.5rem;
-        box-shadow: 0 16px 50px rgba(60,20,90,.25), inset 0 1px 0 rgba(255,255,255,.04);
-        backdrop-filter: blur(14px);
+        box-shadow:
+          0 2px 0 rgba(255,255,255,.10) inset,
+          0 -18px 40px rgba(0,0,0,.30) inset,
+          0 18px 42px rgba(10,4,24,.45),
+          0 3px 10px rgba(0,0,0,.35);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
         margin-bottom: 1.2rem;
-        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+        transform-style: preserve-3d;
+        will-change: transform;
+        transition: transform .12s ease-out, box-shadow .35s ease, border-color .35s ease;
       }
       .glass:hover {
-        transform: translateY(-3px);
-        border-color: rgba(var(--accent-glow),.5);
-        box-shadow: 0 26px 80px rgba(13,60,110,.32), 0 0 0 1px rgba(var(--accent-glow),.18), inset 0 1px 0 rgba(255,255,255,.06);
+        border-color: rgba(var(--accent-glow),.55);
+        box-shadow:
+          0 2px 0 rgba(255,255,255,.14) inset,
+          0 -18px 40px rgba(0,0,0,.28) inset,
+          0 30px 70px rgba(10,4,24,.55),
+          0 0 0 1px rgba(var(--accent-glow),.22),
+          0 0 46px rgba(var(--accent-glow),.28);
       }
       .glass::before {
         content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
-        background: linear-gradient(100deg, transparent, rgba(255,255,255,.05), transparent);
+        background: linear-gradient(100deg, transparent, rgba(255,255,255,.10), transparent);
         transform: skewX(-20deg); pointer-events:none;
         transition: left .7s ease;
       }
       .glass:hover::before { left: 130%; }
+      .glass::after {
+        content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+        background: radial-gradient(120% 60% at 15% 0%, rgba(255,255,255,.14), transparent 55%);
+      }
       .glass-header { display:flex; align-items:center; gap:.5rem; margin-bottom:.9rem; }
       .glass-header .icon { font-size:1.2rem; }
       .glass-title { font-family:'Orbitron', 'Space Grotesk', sans-serif; font-size:1.05rem; font-weight:700; color:#eef5ff; letter-spacing:.01em; }
@@ -413,45 +452,79 @@ st.markdown(
       }
       .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button {
         position: relative; isolation: isolate; overflow: hidden;
-        width: 100%; border: 1px solid rgba(124,255,178,.55); border-radius: 14px;
-        padding: .85rem 1rem;
+        width: 100%; border: 1px solid rgba(255,255,255,.35); border-radius: 16px;
+        padding: .9rem 1rem;
         font-family: 'Orbitron', 'Space Grotesk', sans-serif !important;
         font-weight: 700; font-size: .95rem; letter-spacing: .04em; text-transform: uppercase;
-        color: #1a0f2e;
-        background: linear-gradient(100deg, #ff8fd6, var(--accent), #7ee0ff, #ffe08a, #ff8fd6);
-        background-size: 320% auto;
+        color: #f5f2ff;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0) 46%),
+          linear-gradient(100deg, rgba(176,107,255,.55), rgba(var(--accent-glow),.55), rgba(34,227,255,.55), rgba(255,224,138,.5), rgba(176,107,255,.55));
+        background-size: 100% 100%, 320% auto;
+        backdrop-filter: blur(16px) saturate(160%);
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
         animation: btnGradientFlow 5s ease-in-out infinite, btnPulseRing 3.2s ease-in-out infinite;
+        box-shadow:
+          0 1px 0 rgba(255,255,255,.5) inset,
+          0 -10px 20px rgba(0,0,0,.22) inset,
+          0 12px 30px rgba(10,4,24,.4);
         transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, filter .25s ease;
       }
       .stButton > button::before, .stDownloadButton > button::before, .stFormSubmitButton > button::before {
         content: ''; position: absolute; inset: -1px; z-index: -1; border-radius: inherit;
-        background: linear-gradient(90deg, var(--accent), #5865f2, #7cffb2, var(--accent));
-        background-size: 300% auto; filter: blur(10px); opacity: .0;
+        background: linear-gradient(90deg, var(--accent), #22e3ff, #b06bff, var(--accent));
+        background-size: 300% auto; filter: blur(14px); opacity: .0;
         transition: opacity .25s ease;
       }
       .stButton > button::after, .stDownloadButton > button::after, .stFormSubmitButton > button::after {
         content: ''; position: absolute; top: 0; left: 0; width: 35%; height: 100%;
-        background: linear-gradient(100deg, transparent, rgba(255,255,255,.75), transparent);
+        background: linear-gradient(100deg, transparent, rgba(255,255,255,.85), transparent);
         transform: translateX(-120%) skewX(-20deg); pointer-events: none;
       }
       .stButton > button:hover, .stDownloadButton > button:hover, .stFormSubmitButton > button:hover {
-        transform: translateY(-2px) scale(1.02);
-        filter: saturate(1.25) brightness(1.06);
-        box-shadow: 0 14px 46px rgba(88,101,242,.65), 0 0 30px rgba(var(--accent-glow),.55), 0 0 0 1px rgba(124,255,178,.7);
+        transform: translateY(-3px) scale(1.025) perspective(600px) rotateX(3deg);
+        filter: saturate(1.3) brightness(1.1);
+        box-shadow:
+          0 1px 0 rgba(255,255,255,.6) inset,
+          0 -10px 20px rgba(0,0,0,.2) inset,
+          0 20px 50px rgba(10,4,24,.5), 0 0 34px rgba(var(--accent-glow),.6), 0 0 0 1px rgba(255,255,255,.5);
         animation-play-state: running;
       }
-      .stButton > button:hover::before, .stDownloadButton > button:hover::before, .stFormSubmitButton > button:hover::before { opacity: .85; }
+      .stButton > button:hover::before, .stDownloadButton > button:hover::before, .stFormSubmitButton > button:hover::before { opacity: .9; }
       .stButton > button:hover::after, .stDownloadButton > button:hover::after, .stFormSubmitButton > button:hover::after {
         animation: btnScan .9s ease forwards;
       }
       .stButton > button:active, .stDownloadButton > button:active, .stFormSubmitButton > button:active {
-        transform: translateY(0) scale(.97);
+        transform: translateY(0) scale(.97) perspective(600px) rotateX(0deg);
         filter: brightness(.95);
       }
       .stButton > button:focus-visible, .stDownloadButton > button:focus-visible {
         outline: none; box-shadow: 0 0 0 3px rgba(var(--accent-glow),.5), 0 14px 46px rgba(88,101,242,.6);
       }
-      .stButton > button p, .stDownloadButton > button p { font-family: inherit !important; letter-spacing: inherit !important; }
+      .stButton > button p, .stDownloadButton > button p { font-family: inherit !important; letter-spacing: inherit !important; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+
+      /* Drag & drop file uploader — glass 3D dropzone */
+      [data-testid="stFileUploaderDropzone"] {
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 50%),
+          linear-gradient(145deg, rgba(58,46,96,.5), rgba(14,16,36,.65)) !important;
+        border: 2px dashed rgba(var(--accent-glow),.55) !important;
+        border-radius: 20px !important;
+        backdrop-filter: blur(14px) saturate(150%);
+        box-shadow: 0 -12px 26px rgba(0,0,0,.25) inset, 0 14px 34px rgba(10,4,24,.4);
+        transition: border-color .25s ease, box-shadow .25s ease, transform .2s ease;
+      }
+      [data-testid="stFileUploaderDropzone"]:hover {
+        border-color: rgba(var(--accent-glow),.9) !important;
+        box-shadow: 0 -12px 26px rgba(0,0,0,.2) inset, 0 18px 46px rgba(10,4,24,.5), 0 0 30px rgba(var(--accent-glow),.35);
+        transform: translateY(-2px);
+      }
+      [data-testid="stFileUploaderDropzoneInstructions"] svg { filter: drop-shadow(0 0 8px rgba(var(--accent-glow),.6)); }
+      [data-testid="stFileUploader"] button {
+        border-radius: 12px !important; border: 1px solid rgba(255,255,255,.35) !important;
+        background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.02)) !important;
+        backdrop-filter: blur(10px);
+      }
 
       [data-testid="stExpander"] { background: rgba(10,14,34,.55); border: 1px solid rgba(88,101,242,.25); border-radius: 18px; }
 
@@ -558,10 +631,14 @@ NEURON_SYNAPSES = [
 
 
 def _build_neural_bg() -> str:
-    """Fixed-position SVG of glowing neuron nodes wired by pulsing synapses."""
+    """Fixed-position SVG of layered, 3D-lit neuron spheres wired by pulsing
+    synapses with a travelling signal dot — a living nervous-system backdrop."""
+    # Depth layers: far (small, blurred, dim) → near (large, sharp, bright).
     circles = "".join(
-        f'<circle class="neuron" cx="{x}" cy="{y}" r="{0.55 + (i % 3) * 0.12}" '
-        f'style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        f'<circle class="neuron depth-{i % 3}" cx="{x}" cy="{y}" '
+        f'r="{0.5 + (i % 3) * 0.22}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
+        f'<circle class="neuron-core depth-{i % 3}" cx="{x - 0.18}" cy="{y - 0.18}" '
+        f'r="{0.16 + (i % 3) * 0.05}" style="animation-delay:{(i * 0.37) % 4:.2f}s"/>'
         for i, (x, y) in enumerate(NEURON_POSITIONS)
     )
     lines = "".join(
@@ -570,12 +647,27 @@ def _build_neural_bg() -> str:
         f'style="animation-delay:{((a + b) * 0.29) % 5:.2f}s"/>'
         for i, (a, b) in enumerate(NEURON_SYNAPSES)
     )
+    # A travelling "pulse" spark riding along a subset of synapses, giving the
+    # impression of an actual signal firing across the network in real time.
+    pulses = "".join(
+        f'<circle class="pulse-spark" r="0.85">'
+        f'<animateMotion dur="{3 + (i % 4) * 0.8:.1f}s" repeatCount="indefinite" '
+        f'begin="{(i * 0.6) % 4:.1f}s" '
+        f'path="M{NEURON_POSITIONS[a][0]},{NEURON_POSITIONS[a][1]} '
+        f'L{NEURON_POSITIONS[b][0]},{NEURON_POSITIONS[b][1]}"/>'
+        f'</circle>'
+        for i, (a, b) in enumerate(NEURON_SYNAPSES)
+        if i % 3 == 0
+    )
     return f'''
-    <div class="neural-bg">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <g class="synapses">{lines}</g>
-            <g class="neurons">{circles}</g>
-        </svg>
+    <div class="neural-bg" id="neuralBg">
+        <div class="neural-bg-inner" id="neuralBgInner">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <g class="synapses">{lines}</g>
+                <g class="pulses">{pulses}</g>
+                <g class="neurons">{circles}</g>
+            </svg>
+        </div>
     </div>
     '''
 
@@ -586,31 +678,57 @@ st.markdown(
       .neural-bg {
         position: fixed; inset: 0; width: 100vw; height: 100vh;
         z-index: 0; pointer-events: none; overflow: hidden;
+        perspective: 1200px;
+      }
+      .neural-bg-inner {
+        position: absolute; inset: -4%; width: 108%; height: 108%;
+        transform-style: preserve-3d;
+        transition: transform .3s ease-out;
+        will-change: transform;
       }
       .neural-bg svg { width: 100%; height: 100%; }
+
       .synapse {
         stroke: url(#synapseGrad);
-        stroke-width: .1;
-        opacity: .18;
-        stroke-dasharray: 3 5;
+        stroke-width: .12;
+        opacity: .22;
+        stroke-dasharray: 2 4;
+        stroke-linecap: round;
         animation: synapseFire 4.5s linear infinite;
       }
+      /* Outer sphere body — soft 3D falloff via radial gradient fill */
       .neuron {
-        fill: var(--accent);
-        opacity: .55;
-        filter: drop-shadow(0 0 .9px rgba(var(--accent-glow),.9));
+        fill: url(#neuronSphere);
         animation: neuronFire 3.6s ease-in-out infinite;
       }
+      .neuron.depth-0 { opacity: .28; filter: blur(.35px) drop-shadow(0 0 1px rgba(var(--accent-glow),.5)); }
+      .neuron.depth-1 { opacity: .5; filter: drop-shadow(0 0 1.6px rgba(var(--accent-glow),.7)); }
+      .neuron.depth-2 { opacity: .8; filter: drop-shadow(0 0 3px rgba(var(--accent-glow),.95)); }
+      /* Bright specular highlight offset toward upper-left = 3D sphere look */
+      .neuron-core {
+        fill: #ffffff;
+        animation: neuronFire 3.6s ease-in-out infinite;
+      }
+      .neuron-core.depth-0 { opacity: .22; }
+      .neuron-core.depth-1 { opacity: .4; }
+      .neuron-core.depth-2 { opacity: .65; }
+
+      .pulse-spark {
+        fill: #ffffff;
+        filter: drop-shadow(0 0 3px rgba(var(--accent-glow),1)) drop-shadow(0 0 6px rgba(255,255,255,.8));
+        opacity: .9;
+      }
+
       @keyframes synapseFire {
-        0%   { stroke-dashoffset: 40; opacity: .10; }
-        45%  { opacity: .5; }
-        50%  { stroke-dashoffset: 0; opacity: .55; }
-        55%  { opacity: .5; }
-        100% { stroke-dashoffset: -40; opacity: .10; }
+        0%   { stroke-dashoffset: 30; opacity: .12; }
+        45%  { opacity: .55; }
+        50%  { stroke-dashoffset: 0; opacity: .62; }
+        55%  { opacity: .55; }
+        100% { stroke-dashoffset: -30; opacity: .12; }
       }
       @keyframes neuronFire {
-        0%, 100% { opacity: .35; r: .55; }
-        50% { opacity: 1; r: .95; filter: drop-shadow(0 0 2.4px rgba(255,94,174,.95)); }
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.35); }
       }
       /* Keep real app content above the neuron layer */
       .block-container, [data-testid="stHeader"] { position: relative; z-index: 1; }
@@ -619,16 +737,72 @@ st.markdown(
       <defs>
         <linearGradient id="synapseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" style="stop-color:var(--accent)"/>
-          <stop offset="35%" stop-color="#ff8fd6"/>
+          <stop offset="35%" stop-color="#22e3ff"/>
           <stop offset="65%" stop-color="#7ee0ff"/>
           <stop offset="100%" stop-color="#ffe08a"/>
         </linearGradient>
+        <radialGradient id="neuronSphere" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" style="stop-color:var(--accent)"/>
+          <stop offset="100%" stop-color="#22e3ff"/>
+        </radialGradient>
       </defs>
     </svg>
     """,
     unsafe_allow_html=True,
 )
 st.markdown(_build_neural_bg(), unsafe_allow_html=True)
+
+# ---------------------------------------------------------------------------
+# Dynamic reactivity: mouse-driven 3D parallax for the neural backdrop, plus a
+# lightweight tilt effect on every glass panel — reattached on every Streamlit
+# rerun since the DOM is replaced each time.
+# ---------------------------------------------------------------------------
+st.markdown(
+    """
+    <script>
+    (function() {
+      const doc = window.parent ? window.parent.document : document;
+
+      function attachParallax() {
+        const bgInner = doc.getElementById('neuralBgInner');
+        if (bgInner && !bgInner.dataset.wired) {
+          bgInner.dataset.wired = '1';
+          doc.addEventListener('mousemove', (e) => {
+            const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+            const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+            bgInner.style.transform =
+              'rotateY(' + (nx * 4) + 'deg) rotateX(' + (-ny * 4) + 'deg) translateZ(0)';
+          });
+        }
+      }
+
+      function attachTilt() {
+        doc.querySelectorAll('.glass:not([data-tilt])').forEach((card) => {
+          card.setAttribute('data-tilt', '1');
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const px = (e.clientX - rect.left) / rect.width - 0.5;
+            const py = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform =
+              'perspective(900px) rotateX(' + (-py * 6) + 'deg) rotateY(' + (px * 6) + 'deg) translateY(-3px)';
+          });
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0)';
+          });
+        });
+      }
+
+      attachParallax();
+      attachTilt();
+      // Streamlit re-renders parts of the DOM on every interaction — keep
+      // wiring up any newly mounted elements without duplicating listeners.
+      setInterval(() => { attachParallax(); attachTilt(); }, 800);
+    })();
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
 
 _live = st.session_state.last_result
 _live_info = sentiment_info(_live["label"]) if _live else {
@@ -642,7 +816,9 @@ st.markdown(
     f'<span class="nerve-dot"></span>{_live_info["emoji"]} {_live_info["name"]}</span></div>',
     unsafe_allow_html=True,
 )
+st.markdown('<div class="title-wrap">', unsafe_allow_html=True)
 st.title("NeuroPulse AI\nRead the emotion beneath the words.")
+st.markdown('</div>', unsafe_allow_html=True)
 st.markdown(
     '<p class="lead">A futuristic, neural-powered lens into <span class="hi">mental-health text sentiment</span>. '
     'Explore the dataset, compare 12 embedding × architecture combinations, and run live inference — all in one '
@@ -766,24 +942,36 @@ with tab_analyze:
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown(
         '''<div class="glass">
-            <div class="glass-header"><span class="icon">📦</span><span class="glass-title">Batch analysis — upload a CSV</span></div>
-            <div class="glass-sub">Upload a CSV with a text column and NeuroPulse will score every row's emotional intensity in one pass.</div>
+            <div class="glass-header"><span class="icon">📦</span><span class="glass-title">Batch analysis — drag &amp; drop your CSVs</span></div>
+            <div class="glass-sub">Drag one or more CSV files (each with a text column) straight onto the dropzone below, or click to browse — NeuroPulse will score every row's emotional intensity in one pass.</div>
         </div>''',
         unsafe_allow_html=True,
     )
 
-    uploaded_csv = st.file_uploader(
-        "Upload CSV for batch prediction", type=["csv"], label_visibility="collapsed", key="batch_csv_uploader"
+    uploaded_csvs = st.file_uploader(
+        "Drag & drop CSV file(s) for batch prediction",
+        type=["csv"],
+        label_visibility="collapsed",
+        key="batch_csv_uploader",
+        accept_multiple_files=True,
+        help="Drop multiple CSVs at once — they'll be combined into a single batch run, tagged by source file.",
     )
 
-    if uploaded_csv is not None:
+    if uploaded_csvs:
         try:
-            batch_df = pd.read_csv(uploaded_csv)
+            frames = []
+            for uploaded_csv in uploaded_csvs:
+                frame = pd.read_csv(uploaded_csv)
+                frame.insert(0, "source_file", uploaded_csv.name)
+                frames.append(frame)
+            batch_df = pd.concat(frames, ignore_index=True, sort=False) if frames else None
         except Exception as exc:  # noqa: BLE001
-            st.error(f"Couldn't read that CSV: {exc}")
+            st.error(f"Couldn't read one of those CSVs: {exc}")
             batch_df = None
 
         if batch_df is not None and not batch_df.empty:
+            if len(uploaded_csvs) > 1:
+                st.caption(f"📎 {len(uploaded_csvs)} files combined — {len(batch_df)} rows total.")
             text_columns = [c for c in batch_df.columns if batch_df[c].dtype == object] or list(batch_df.columns)
             default_idx = 0
             for guess in ("text", "post", "message", "content", "input"):
